@@ -17,6 +17,7 @@ import Button from "react-bootstrap/Button";
 import { Link } from "react-router-dom";
 import { RiDeleteBin5Fill, RiEdit2Fill } from 'react-icons/ri'
 import Spinner from "react-bootstrap/esm/Spinner";
+import { useCSRFTokenContext } from '../Context/CSRFfTokenContext.js'
 
 const RL12 = () => {
   const [tahun, setTahun] = useState("");
@@ -29,6 +30,7 @@ const RL12 = () => {
   const [token, setToken] = useState("");
   const [expire, setExpire] = useState("");
   const [spinner, setSpinner] = useState(false)
+  const { CSRFToken } = useCSRFTokenContext()
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -46,7 +48,13 @@ const RL12 = () => {
 
   const refreshToken = async () => {
     try {
-      const response = await axios.get("/apisirs/token");
+      const customConfig = {
+          headers: {
+              'XSRF-TOKEN': CSRFToken
+          }
+      }
+
+      const response = await axios.get('/apisirs/token', customConfig)
       setToken(response.data.accessToken);
       const decoded = jwt_decode(response.data.accessToken);
       setExpire(decoded.exp);
@@ -63,7 +71,14 @@ const RL12 = () => {
     async (config) => {
       const currentDate = new Date();
       if (expire * 1000 < currentDate.getTime()) {
-        const response = await axios.get("/apisirs/token");
+        const customConfig = {
+          headers: {
+            'XSRF-TOKEN': CSRFToken
+          }
+        }
+
+        const response = await axios.get('/apisirs/token', customConfig)
+
         config.headers.Authorization = `Bearer ${response.data.accessToken}`;
         setToken(response.data.accessToken);
         const decoded = jwt_decode(response.data.accessToken);

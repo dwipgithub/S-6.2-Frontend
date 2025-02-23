@@ -3,8 +3,9 @@ import axios from 'axios'
 import jwt_decode from 'jwt-decode'
 import { HiSaveAs } from 'react-icons/hi'
 import { useNavigate } from 'react-router-dom'
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer, toast } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
+import { useCSRFTokenContext } from '../Context/CSRFfTokenContext.js'
 
 const FormUbahPassword = () => {
     const [id, setId] = useState('')
@@ -14,6 +15,7 @@ const FormUbahPassword = () => {
     const [passwordBaru, setPasswordBaru] = useState('')
     const [passwordBaruConfirmation, setPasswordBaruConfirmation] = useState('')
     const [buttonStatus, setButtonStatus] = useState(false)
+    const { CSRFToken } = useCSRFTokenContext()
     const navigate = useNavigate()
 
     useEffect(() => {
@@ -23,8 +25,16 @@ const FormUbahPassword = () => {
     },[])
 
     const refreshToken = async() => {
+        console.log(CSRFToken)
         try {
-            const response = await axios.get('/apisirs/token')
+            const customConfig = {
+                headers: {
+                    'XSRF-TOKEN': CSRFToken
+                }
+            }
+
+            const response = await axios.get('/apisirs/token', customConfig)
+
             setToken(response.data.accessToken)
             const decoded = jwt_decode(response.data.accessToken)
             setId(decoded.id)
@@ -40,7 +50,14 @@ const FormUbahPassword = () => {
     axiosJWT.interceptors.request.use(async(config) => {
         const currentDate = new Date()
         if (expire * 1000 < currentDate.getTime()) {
-            const response = await axios.get('/apisirs/token')
+            const customConfig = {
+                headers: {
+                    'XSRF-TOKEN': CSRFToken
+                }
+            }
+
+            const response = await axios.get('/apisirs/token', customConfig)
+            
             config.headers.Authorization = `Bearer ${response.data.accessToken}`
             const decoded = jwt_decode(response.data.accessToken)
             setExpire(decoded.exp)
@@ -57,6 +74,7 @@ const FormUbahPassword = () => {
             const customConfig = {
                 headers: {
                     'Content-Type': 'application/json',
+                    'XSRF-TOKEN': CSRFToken,
                     'Authorization': `Bearer ${token}`
                 }
             } 
@@ -93,19 +111,19 @@ const FormUbahPassword = () => {
                             <div className='card-body'>
                                 <h5 className="card-title h5">Ubah Password</h5>
                                 <div className="form-floating mt-2 mb-2" style={{width:"100%", display:"inline-block"}}>
-                                    <input type="password" className="form-control" id="floatingInput"
+                                    <input type="password" className="form-control" id="passwordLamaInput"
                                         value={ passwordLama } disabled={false} onChange={e => setPasswordLama(e.target.value)}/>
-                                    <label htmlFor="floatingInput">Password Lama</label>
+                                    <label htmlFor="passwordLamaInput">Password Lama</label>
                                 </div>
                                 <div className="form-floating mb-2" style={{width:"100%", display:"inline-block"}}>
-                                    <input type="password" className="form-control" id="floatingInput"
+                                    <input type="password" className="form-control" id="passwordBarInput"
                                         value={ passwordBaru } disabled={false} onChange={e => setPasswordBaru(e.target.value)} />
-                                    <label htmlFor="floatingInput">Password Baru</label>
+                                    <label htmlFor="passwordBaruInput">Password Baru</label>
                                 </div>
                                 <div className="form-floating" style={{width:"100%", display:"inline-block"}}>
-                                    <input type="password" className="form-control" id="floatingInput"
+                                    <input type="password" className="form-control" id="konfirasiPasswordBaruInput"
                                         value={ passwordBaruConfirmation } disabled={false} onChange={e => setPasswordBaruConfirmation(e.target.value)} />
-                                    <label htmlFor="floatingInput">Konfirmasi Password Baru</label>
+                                    <label htmlFor="konfirmasiPasswordBaruInput">Konfirmasi Password Baru</label>
                                 </div>
                                 <div className="mt-3">
                                     <ToastContainer />

@@ -1,26 +1,38 @@
 import React, { useEffect } from 'react'
+import axios from 'axios'
 import Container from 'react-bootstrap/Container'
 import Nav from 'react-bootstrap/Nav'
 import Navbar from 'react-bootstrap/Navbar'
 import NavDropdown  from 'react-bootstrap/NavDropdown'
-import axios from 'axios'
 import { Link, useNavigate } from 'react-router-dom'
 import logoImage from '../Images/sirsIcon.png'
+import { useCSRFTokenContext } from '../Context/CSRFfTokenContext.js';
 
 const NavigationBar = () => {
     const navigate = useNavigate()
+    const { CSRFToken } = useCSRFTokenContext()
     useEffect(() => {
         document.title = "SIRS Online Versi 6"
     },[])
+
     const Logout = async() => {
         try {
-            await axios.delete('/apisirs/logout')
+            const customConfig = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'XSRF-TOKEN': CSRFToken
+                },
+                withCredentials: true
+            } 
+
+            await axios.post('/apisirs/logout',{}, customConfig)
             localStorage.removeItem('name')
             navigate('/')
         } catch (error) {
             console.log(error)
         }
     }
+
     return (
         <Navbar className="navbar fixed-top navbar-expand-lg" style={{backgroundSize: "0", backgroundColor: "#E1E6EA"}}>
             <Container>

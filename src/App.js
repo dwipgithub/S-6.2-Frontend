@@ -1,4 +1,6 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom"
+import { CSRFTokenProvider } from "./components/Context/CSRFfTokenContext.js"
+
 import 'bootstrap/dist/css/bootstrap.min.css'
 import Login from "./components/Login/Login"
 import NavigationBar from "./components/NavigationBar/NavigationBar"
@@ -139,120 +141,122 @@ import RL54 from "./components/RL54/RL54.js"
 
 function App() {
   return (
-    <BrowserRouter basename="">
-      <Routes>
-        <Route path="/" element={<Login/>} />
-        <Route path="/beranda" element={<><NavigationBar/></>} />
-        <Route path="/user/tambahuser" element={<><NavigationBar/><FormTambahUser/></>}/>
-        <Route path="/user/ubahpassword" element={<><NavigationBar/><FormUbahPassword/></>}/>
+    <CSRFTokenProvider>
+      <BrowserRouter basename="">
+        <Routes>
+          <Route path="/" element={<Login/>} />
+          <Route path="/beranda" element={<><NavigationBar/></>} />
+          <Route path="/user/tambahuser" element={<><NavigationBar/><FormTambahUser/></>}/>
+          <Route path="/user/ubahpassword" element={<><NavigationBar/><FormUbahPassword/></>}/>
 
-        <Route path="/rl12" element={<><NavigationBar/><RL12/></>}/>
-        <Route path="/rl12/tambah" element={<><NavigationBar/><FormTambahRL12/></>}/>
-        <Route path="/rl12/edit/:id" element={<><NavigationBar/><FormEditRL12/></>}/>
+          <Route path="/rl12" element={<><NavigationBar/><RL12/></>}/>
+          <Route path="/rl12/tambah" element={<><NavigationBar/><FormTambahRL12/></>}/>
+          <Route path="/rl12/edit/:id" element={<><NavigationBar/><FormEditRL12/></>}/>
 
-        <Route path="/rl13" element={<><NavigationBar/><RL13/></>}/>
-        <Route path="/rl13/tambah" element={<><NavigationBar/><FormTambahRL13/></>}/>
-        <Route path="/rl13/ubah/:id" element={<><NavigationBar/><FormUbahRL13/></>}/>
+          <Route path="/rl13" element={<><NavigationBar/><RL13/></>}/>
+          <Route path="/rl13/tambah" element={<><NavigationBar/><FormTambahRL13/></>}/>
+          <Route path="/rl13/ubah/:id" element={<><NavigationBar/><FormUbahRL13/></>}/>
 
-        <Route path="/rl31" element={<><NavigationBar/><RL31/></>}/>
-        <Route path="/rl31/tambah" element={<><NavigationBar/><FormTambahRL31/></>}/>
-        <Route path="/rl31/ubah/:id" element={<><NavigationBar/><FormUbahRL31/></>}/>
+          <Route path="/rl31" element={<><NavigationBar/><RL31/></>}/>
+          <Route path="/rl31/tambah" element={<><NavigationBar/><FormTambahRL31/></>}/>
+          <Route path="/rl31/ubah/:id" element={<><NavigationBar/><FormUbahRL31/></>}/>
 
-        <Route path="/rl32" element={<><NavigationBar/><RL32/></>}/>
-        <Route path="/rl32/tambah" element={<><NavigationBar/><FormTambahRL32/></>}/>
-        <Route path="/rl32/ubah/:id" element={<><NavigationBar/><FormUbahRL32/></>}/>
+          <Route path="/rl32" element={<><NavigationBar/><RL32/></>}/>
+          <Route path="/rl32/tambah" element={<><NavigationBar/><FormTambahRL32/></>}/>
+          <Route path="/rl32/ubah/:id" element={<><NavigationBar/><FormUbahRL32/></>}/>
 
-        <Route path="/rl33" element={<><NavigationBar/><RL33/></>}/>
-        <Route path="/rl33/tambah" element={<><NavigationBar/><FormTambahRL33/></>}/>
-        <Route path="/rl33/ubah/:id" element={<><NavigationBar/><FormUbahRL33/></>}/>
-        
-        <Route path="/rl34" element={<><NavigationBar/><RL34/></>}/>
-        <Route path="/rl34/tambah" element={<><NavigationBar/><FormTambahRL34/></>}/>
-        <Route path="/rl34/ubah/:id" element={<><NavigationBar/><FormUbahRL34/></>}/>
-        
-        <Route path="/rl35" element={<><NavigationBar/><RL35/></>}/>
-        <Route path="/rl35/tambah" element={<><NavigationBar/><FormTambahRL35/></>}/>
-        <Route path="/rl35/ubah/:id" element={<><NavigationBar/><FormUbahRL35/></>}/>
-        
-        <Route path="/rl36" element={<><NavigationBar/><RL36/></>}/>
-        <Route path="/rl36/tambah" element={<><NavigationBar/><FormTambahRL36/></>}/>
-        <Route path="/rl36/ubah/:id" element={<><NavigationBar/><FormEditRL36/></>}/>
+          <Route path="/rl33" element={<><NavigationBar/><RL33/></>}/>
+          <Route path="/rl33/tambah" element={<><NavigationBar/><FormTambahRL33/></>}/>
+          <Route path="/rl33/ubah/:id" element={<><NavigationBar/><FormUbahRL33/></>}/>
+          
+          <Route path="/rl34" element={<><NavigationBar/><RL34/></>}/>
+          <Route path="/rl34/tambah" element={<><NavigationBar/><FormTambahRL34/></>}/>
+          <Route path="/rl34/ubah/:id" element={<><NavigationBar/><FormUbahRL34/></>}/>
+          
+          <Route path="/rl35" element={<><NavigationBar/><RL35/></>}/>
+          <Route path="/rl35/tambah" element={<><NavigationBar/><FormTambahRL35/></>}/>
+          <Route path="/rl35/ubah/:id" element={<><NavigationBar/><FormUbahRL35/></>}/>
+          
+          <Route path="/rl36" element={<><NavigationBar/><RL36/></>}/>
+          <Route path="/rl36/tambah" element={<><NavigationBar/><FormTambahRL36/></>}/>
+          <Route path="/rl36/ubah/:id" element={<><NavigationBar/><FormEditRL36/></>}/>
 
-        <Route path="/rl37" element={<><NavigationBar/><RL37/></>}/>
-        <Route path="/rl37/tambah" element={<><NavigationBar/><FormTambahRL37/></>}/>
-        <Route path="/rl37/ubah/:id" element={<><NavigationBar/><FormUbahRL37/></>}/>
+          <Route path="/rl37" element={<><NavigationBar/><RL37/></>}/>
+          <Route path="/rl37/tambah" element={<><NavigationBar/><FormTambahRL37/></>}/>
+          <Route path="/rl37/ubah/:id" element={<><NavigationBar/><FormUbahRL37/></>}/>
 
-        <Route path="/rl38" element={<><NavigationBar/><RL38/></>}/>
-        <Route path="/rl38/tambah"element={<><NavigationBar/><FormTambahRL38/></>}/>
-        <Route path="/rl38/ubah/:id" element={<><NavigationBar/><FormEditRL38 /></>}/>
+          <Route path="/rl38" element={<><NavigationBar/><RL38/></>}/>
+          <Route path="/rl38/tambah"element={<><NavigationBar/><FormTambahRL38/></>}/>
+          <Route path="/rl38/ubah/:id" element={<><NavigationBar/><FormEditRL38 /></>}/>
 
-        <Route path="/rl39" element={<><NavigationBar/><RL39/></>}/>
-        <Route path="/rl39/tambah" element={<><NavigationBar/><FormTambahRL39/></>}/>
-        <Route path="/rl39/ubah/:id" element={<><NavigationBar/><FormEditRL39/></>}/>
+          <Route path="/rl39" element={<><NavigationBar/><RL39/></>}/>
+          <Route path="/rl39/tambah" element={<><NavigationBar/><FormTambahRL39/></>}/>
+          <Route path="/rl39/ubah/:id" element={<><NavigationBar/><FormEditRL39/></>}/>
 
-        <Route path="/rl310" element={<><NavigationBar/><RL310/></>}/>
-        <Route path="/rl310/tambah" element={<><NavigationBar/><FormTambahRL310/></>}/>
-        <Route path="/rl310/edit/:id" element={<><NavigationBar/><FormEditRL310/></>}/>
+          <Route path="/rl310" element={<><NavigationBar/><RL310/></>}/>
+          <Route path="/rl310/tambah" element={<><NavigationBar/><FormTambahRL310/></>}/>
+          <Route path="/rl310/edit/:id" element={<><NavigationBar/><FormEditRL310/></>}/>
 
-        <Route path="/rl311" element={<><NavigationBar/><RL311/></>}/>
-        <Route path="/rl311/tambah" element={<><NavigationBar/><FormTambahRL311/></>}/>
-        <Route path="/rl311/edit/:id" element={<><NavigationBar/><FormEditRL311/></>}/>
+          <Route path="/rl311" element={<><NavigationBar/><RL311/></>}/>
+          <Route path="/rl311/tambah" element={<><NavigationBar/><FormTambahRL311/></>}/>
+          <Route path="/rl311/edit/:id" element={<><NavigationBar/><FormEditRL311/></>}/>
 
-        <Route path="/rl312" element={<><NavigationBar/><RL312/></>}/>
-        <Route path="/rl312/tambah" element={<><NavigationBar/><FormTambahRL312/></>}/>
-        <Route path="/rl312/ubah/:id" element={<><NavigationBar/><FormUbahRL312/></>}/>
+          <Route path="/rl312" element={<><NavigationBar/><RL312/></>}/>
+          <Route path="/rl312/tambah" element={<><NavigationBar/><FormTambahRL312/></>}/>
+          <Route path="/rl312/ubah/:id" element={<><NavigationBar/><FormUbahRL312/></>}/>
 
-        <Route path="/rl313A" element={<><NavigationBar/><RL313A/></>}/>
-        <Route path="/rl313A/tambah" element={<><NavigationBar/><FormTambahRL313A/></>}/>
-        <Route path="/rl313A/ubah/:id" element={<><NavigationBar/><FormUbahRL313A/></>}/>
+          <Route path="/rl313A" element={<><NavigationBar/><RL313A/></>}/>
+          <Route path="/rl313A/tambah" element={<><NavigationBar/><FormTambahRL313A/></>}/>
+          <Route path="/rl313A/ubah/:id" element={<><NavigationBar/><FormUbahRL313A/></>}/>
 
-        <Route path="/rl313B" element={<><NavigationBar/><RL313B/></>}/>
-        <Route path="/rl313B/tambah" element={<><NavigationBar/><FormTambahRL313B/></>}/>
-        <Route path="/rl313B/ubah/:id" element={<><NavigationBar/><FormUbahRL313B/></>}/>
+          <Route path="/rl313B" element={<><NavigationBar/><RL313B/></>}/>
+          <Route path="/rl313B/tambah" element={<><NavigationBar/><FormTambahRL313B/></>}/>
+          <Route path="/rl313B/ubah/:id" element={<><NavigationBar/><FormUbahRL313B/></>}/>
 
-        <Route path="/rl314" element={<><NavigationBar/><RL314/></>}/>
-        <Route path="/rl314/tambah" element={<><NavigationBar/><FormTambahRL314/></>}/>
-        <Route path="/rl314/ubah/:id" element={<><NavigationBar/><FormUbahRL314/></>}/>
+          <Route path="/rl314" element={<><NavigationBar/><RL314/></>}/>
+          <Route path="/rl314/tambah" element={<><NavigationBar/><FormTambahRL314/></>}/>
+          <Route path="/rl314/ubah/:id" element={<><NavigationBar/><FormUbahRL314/></>}/>
 
-        <Route path="/rl315" element={<><NavigationBar/><RL315/></>}/>
-        <Route path="/rl315/tambah" element={<><NavigationBar/><FormTambahRL315/></>}/>
-        <Route path="/rl315/ubah/:id" element={<><NavigationBar/><FormUbahRL315/></>}/>
+          <Route path="/rl315" element={<><NavigationBar/><RL315/></>}/>
+          <Route path="/rl315/tambah" element={<><NavigationBar/><FormTambahRL315/></>}/>
+          <Route path="/rl315/ubah/:id" element={<><NavigationBar/><FormUbahRL315/></>}/>
 
-        <Route path="/rl4a" element={<><NavigationBar/><RL4A/></>}/>
-        <Route path="/rl4a/tambah" element={<><NavigationBar/><FormTambahRL4a/></>}/>
-        <Route path="/rl4a/ubah/:id" element={<><NavigationBar/><FormUbahRL4A/></>}/>
+          <Route path="/rl4a" element={<><NavigationBar/><RL4A/></>}/>
+          <Route path="/rl4a/tambah" element={<><NavigationBar/><FormTambahRL4a/></>}/>
+          <Route path="/rl4a/ubah/:id" element={<><NavigationBar/><FormUbahRL4A/></>}/>
 
-        <Route path="/rl4asebab" element={<><NavigationBar/><RL4ASebab/></>}/>
-        <Route path="/rl4asebab/tambah" element={<><NavigationBar/><FormTambahRL4ASebab/></>}/>
-        <Route path="/rl4asebab/ubah/:id" element={<><NavigationBar/><FormUbahRL4ASebab/></>}/>
+          <Route path="/rl4asebab" element={<><NavigationBar/><RL4ASebab/></>}/>
+          <Route path="/rl4asebab/tambah" element={<><NavigationBar/><FormTambahRL4ASebab/></>}/>
+          <Route path="/rl4asebab/ubah/:id" element={<><NavigationBar/><FormUbahRL4ASebab/></>}/>
 
-        <Route path="/rl4b" element={<><NavigationBar/><RL4B/></>}/>
-        <Route path="/rl4b/tambah" element={<><NavigationBar/><FormTambahRL4B/></>}/>
-        <Route path="/rl4b/ubah/:id" element={<><NavigationBar/><FormEditRL4B/></>}/>
+          <Route path="/rl4b" element={<><NavigationBar/><RL4B/></>}/>
+          <Route path="/rl4b/tambah" element={<><NavigationBar/><FormTambahRL4B/></>}/>
+          <Route path="/rl4b/ubah/:id" element={<><NavigationBar/><FormEditRL4B/></>}/>
 
-        <Route path="/rl4bsebab" element={<><NavigationBar/><RL4BSebab/></>}/>
-        <Route path="/rl4bsebab/tambah" element={<><NavigationBar/><FormTambahRL4BSebab/></>}/>
-        <Route path="/rl4bsebab/ubah/:id" element={<><NavigationBar/><FormEditRL4BSebab/></>}/>
+          <Route path="/rl4bsebab" element={<><NavigationBar/><RL4BSebab/></>}/>
+          <Route path="/rl4bsebab/tambah" element={<><NavigationBar/><FormTambahRL4BSebab/></>}/>
+          <Route path="/rl4bsebab/ubah/:id" element={<><NavigationBar/><FormEditRL4BSebab/></>}/>
 
-        <Route path="/rl51" element={<><NavigationBar/><RL51/></>}/>
-        <Route path="/rl51/tambah" element={<><NavigationBar/><FormTambahRL51/></>}/>
-        <Route path="/rl51/ubah/:id" element={<><NavigationBar/><FormUbahRL51/></>}/>
-        
-        <Route path="/rl52" element={<><NavigationBar/><RL52/></>}/>
-        <Route path="/rl52/tambah" element={<><NavigationBar/><FormTambahRL52/></>}/>
-        <Route path="/rl52/ubah/:id" element={<><NavigationBar/><FormUbahRL52/></>}/>
+          <Route path="/rl51" element={<><NavigationBar/><RL51/></>}/>
+          <Route path="/rl51/tambah" element={<><NavigationBar/><FormTambahRL51/></>}/>
+          <Route path="/rl51/ubah/:id" element={<><NavigationBar/><FormUbahRL51/></>}/>
+          
+          <Route path="/rl52" element={<><NavigationBar/><RL52/></>}/>
+          <Route path="/rl52/tambah" element={<><NavigationBar/><FormTambahRL52/></>}/>
+          <Route path="/rl52/ubah/:id" element={<><NavigationBar/><FormUbahRL52/></>}/>
 
-        <Route path="/rl53" element={<><NavigationBar/><RL53/></>}/>
-        <Route path="/rl53/tambah" element={<><NavigationBar/><FormTambahRL53/></>}/>
-        <Route path="/rl53/ubah/:id" element={<><NavigationBar/><FormUbahRL53/></>}/>
+          <Route path="/rl53" element={<><NavigationBar/><RL53/></>}/>
+          <Route path="/rl53/tambah" element={<><NavigationBar/><FormTambahRL53/></>}/>
+          <Route path="/rl53/ubah/:id" element={<><NavigationBar/><FormUbahRL53/></>}/>
 
-        <Route path="/rl54" element={<><NavigationBar/><RL54/></>}/>
-        <Route path="/rl54/tambah" element={<><NavigationBar/><FormTambahRL54/></>}/>
-        <Route path="/rl54/ubah/:id" element={<><NavigationBar/><FormUbahRL54/></>}/>
+          <Route path="/rl54" element={<><NavigationBar/><RL54/></>}/>
+          <Route path="/rl54/tambah" element={<><NavigationBar/><FormTambahRL54/></>}/>
+          <Route path="/rl54/ubah/:id" element={<><NavigationBar/><FormUbahRL54/></>}/>
 
-        <Route path="*" element={<PageNotFound />} status={404}/>
-      </Routes>
-    </BrowserRouter>
+          <Route path="*" element={<PageNotFound />} status={404}/>
+        </Routes>
+      </BrowserRouter>
+    </CSRFTokenProvider>
   );
 }
 

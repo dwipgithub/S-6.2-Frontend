@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React, { useState  } from 'react'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 import style from './Login.module.css'
@@ -6,13 +6,15 @@ import { BoxArrowDownRight} from "react-bootstrap-icons";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import sirsImage from '../Images/sirsImage4.jpeg'
+import { useCSRFTokenContext } from '../Context/CSRFfTokenContext.js';
 // import ReCAPTCHA from "react-google-recaptcha"
 
 const Login = () => {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
-    const reCaptchaReference = useRef(null)
     const navigate = useNavigate()
+    const { simpanCSRFToken } = useCSRFTokenContext()
+    // const reCaptchaReference = useRef(null)
     // const googleReCaptchaSiteKey = process.env.REACT_APP_GOOGLE_RECAPTCHA_SITE_KEY
 
     const Auth = async(e) => {
@@ -29,7 +31,7 @@ const Login = () => {
                 password: password
                 // reCaptchaToken: reCaptchaToken
             }, customConfig)
-            console.log(results.data.data.name)
+            simpanCSRFToken(results.data.data.csrfToken)
             localStorage.setItem('name', results.data.data.name)
             navigate("/beranda")
         } catch (error) {
