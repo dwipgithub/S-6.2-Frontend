@@ -6,10 +6,9 @@ import style from './FormTambahRL54.module.css'
 import { HiSaveAs } from 'react-icons/hi'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { IoArrowBack } from 'react-icons/io5'
 import { Typeahead } from 'react-bootstrap-typeahead';
 import Spinner from 'react-bootstrap/esm/Spinner'
-
+import { useCSRFTokenContext } from '../Context/CSRFfTokenContext.js'
 
 const FormTambahRL54 = () => {
     const [tahun, setTahun] = useState('2022')
@@ -25,6 +24,7 @@ const FormTambahRL54 = () => {
     const [buttonStatus, setButtonStatus] = useState(false)
     const navigate = useNavigate()
     const [selected, setSelected] = useState([]);
+    const { CSRFToken } = useCSRFTokenContext()
 
     useEffect(() => {
         refreshToken()
@@ -36,7 +36,13 @@ const FormTambahRL54 = () => {
 
     const refreshToken = async() => {
         try {
-            const response = await axios.get('/apisirs/token')
+            const customConfig = {
+                headers: {
+                    'XSRF-TOKEN': CSRFToken
+                }
+            }
+    
+            const response = await axios.get('/apisirs/token', customConfig)
             setToken(response.data.accessToken)
             const decoded = jwt_decode(response.data.accessToken)
             setExpire(decoded.exp)
@@ -52,7 +58,13 @@ const FormTambahRL54 = () => {
     axiosJWT.interceptors.request.use(async(config) => {
         const currentDate = new Date()
         if (expire * 1000 < currentDate.getTime()) {
-            const response = await axios.get('/apisirs/token')
+            const customConfig = {
+                headers: {
+                    'XSRF-TOKEN': CSRFToken
+                }
+            }
+    
+            const response = await axios.get('/apisirs/token', customConfig)
             config.headers.Authorization = `Bearer ${response.data.accessToken}`
             setToken(response.data.accessToken)
             const decoded = jwt_decode(response.data.accessToken)
@@ -241,6 +253,7 @@ setSpinner(false)
             const customConfig = {
                 headers: {
                     'Content-Type': 'application/json',
+                    'XSRF-TOKEN': CSRFToken,
                     'Authorization': `Bearer ${token}`
                 }
             }

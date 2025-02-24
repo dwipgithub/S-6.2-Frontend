@@ -4,13 +4,12 @@ import jwt_decode from 'jwt-decode'
 import { useNavigate, Link } from 'react-router-dom'
 import style from './FormTambahRL51.module.css'
 import { HiSaveAs } from 'react-icons/hi'
-import { RiDeleteBin5Fill, RiEdit2Fill } from 'react-icons/ri'
-import { AiFillFileAdd } from 'react-icons/ai'
 import { confirmAlert } from 'react-confirm-alert'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css'
 import 'react-confirm-alert/src/react-confirm-alert.css'
 import Spinner from 'react-bootstrap/Spinner';
+import { useCSRFTokenContext } from '../Context/CSRFfTokenContext.js'
 
 const RL51 = () => {
     const [tahun, setTahun] = useState('2022')
@@ -24,6 +23,7 @@ const RL51 = () => {
     const [expire, setExpire] = useState('')
     const navigate = useNavigate()
     const [spinner, setSpinner]= useState(false)
+    const { CSRFToken } = useCSRFTokenContext()
 
     useEffect(() => {
         refreshToken()
@@ -32,7 +32,13 @@ const RL51 = () => {
 
     const refreshToken = async() => {
         try {
-            const response = await axios.get('/apisirs/token')
+            const customConfig = {
+                headers: {
+                    'XSRF-TOKEN': CSRFToken
+                }
+            }
+    
+            const response = await axios.get('/apisirs/token', customConfig)
             setToken(response.data.accessToken)
             const decoded = jwt_decode(response.data.accessToken)
             setExpire(decoded.exp)
@@ -48,7 +54,13 @@ const RL51 = () => {
     axiosJWT.interceptors.request.use(async(config) => {
         const currentDate = new Date()
         if (expire * 1000 < currentDate.getTime()) {
-            const response = await axios.get('/apisirs/token')
+            const customConfig = {
+                headers: {
+                    'XSRF-TOKEN': CSRFToken
+                }
+            }
+    
+            const response = await axios.get('/apisirs/token', customConfig)
             config.headers.Authorization = `Bearer ${response.data.accessToken}`
             setToken(response.data.accessToken)
             const decoded = jwt_decode(response.data.accessToken)
@@ -167,6 +179,7 @@ const RL51 = () => {
         const customConfig = {
             headers: {
                 'Content-Type': 'application/json',
+                'XSRF-TOKEN': CSRFToken,
                 'Authorization': `Bearer ${token}`
             }
         }

@@ -1,15 +1,13 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import React, { useState, useEffect } from "react"
+import axios from "axios"
 import jwt_decode from "jwt-decode";
-import { useNavigate, useParams, Link} from "react-router-dom";
-import style from "./FormTambahRL12.module.css";
-import { HiSaveAs } from "react-icons/hi";
-import { IoArrowBack } from 'react-icons/io5';
-import { ToastContainer, toast } from "react-toastify";
-
+import { useNavigate, useParams, Link} from "react-router-dom"
+import style from "./FormTambahRL12.module.css"
+import { HiSaveAs } from "react-icons/hi"
+import { ToastContainer, toast } from "react-toastify"
+import { useCSRFTokenContext } from '../Context/CSRFfTokenContext.js'
 
 const FormEditRL12 = () => {
-  // const [tahun, setTahun] = useState('')f
   const [namaRS, setNamaRS] = useState("");
   const [alamatRS, setAlamatRS] = useState("");
   const [namaPropinsi, setNamaPropinsi] = useState("");
@@ -17,17 +15,15 @@ const FormEditRL12 = () => {
   const [token, setToken] = useState("");
   const [expire, setExpire] = useState("");
   const navigate = useNavigate();
-  const [msg, setMsg] = useState("");
-  const [dataRL, setData] = useState([]);
-   const [tahun, setTahun] = useState('')
-    const [bor, setBor] = useState('')
-    const [los, setLos] = useState('')
-    const [bto, setBto] = useState('')
-    const [toi, setToi] = useState('')
-    const [gdr, setGdr] = useState('')
-    const [ndr, setNdr] = useState('')
-    const [rata_kunjungan, setRataKunjungan] = useState('')
-    const { id } = useParams();
+  const [bor, setBor] = useState('')
+  const [los, setLos] = useState('')
+  const [bto, setBto] = useState('')
+  const [toi, setToi] = useState('')
+  const [gdr, setGdr] = useState('')
+  const [ndr, setNdr] = useState('')
+  const [rata_kunjungan, setRataKunjungan] = useState('')
+  const { id } = useParams()
+  const { CSRFToken } = useCSRFTokenContext()
 
   useEffect(() => {
     refreshToken();
@@ -37,7 +33,14 @@ const FormEditRL12 = () => {
 
   const refreshToken = async () => {
     try {
-      const response = await axios.get("/apisirs/token");
+      const customConfig = {
+        headers: {
+            'XSRF-TOKEN': CSRFToken
+        }
+      }
+
+      const response = await axios.get('/apisirs/token', customConfig)
+
       setToken(response.data.accessToken);
       const decoded = jwt_decode(response.data.accessToken);
       setExpire(decoded.exp);
@@ -52,9 +55,16 @@ const FormEditRL12 = () => {
   const axiosJWT = axios.create();
   axiosJWT.interceptors.request.use(
     async (config) => {
-      const currentDate = new Date();
+      const currentDate = new Date()
       if (expire * 1000 < currentDate.getTime()) {
-        const response = await axios.get("/apisirs/token");
+        const customConfig = {
+          headers: {
+              'XSRF-TOKEN': CSRFToken
+          }
+        }
+
+        const response = await axios.get('/apisirs/token', customConfig)
+
         config.headers.Authorization = `Bearer ${response.data.accessToken}`;
         setToken(response.data.accessToken);
         const decoded = jwt_decode(response.data.accessToken);
@@ -101,27 +111,28 @@ const FormEditRL12 = () => {
   const updateDataRLSatuTitikDua = async (e) => {
         e.preventDefault();
         try {
-            const customConfig = {
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${token}`
-                        }
-                    }
-            const result = await axiosJWT.patch('/apisirs/rlsatutitikdua/' + id, {
-                bor,
-                los,
-                bto,
-                toi,
-                ndr,
-                gdr,
-                rata_kunjungan,
-            }, customConfig);
-            toast('Data Berhasil Diupdate', {
-                position: toast.POSITION.TOP_RIGHT
-            })
-            setTimeout(() => {
-                navigate('/rl12')
-            }, 1000);
+          const customConfig = {
+              headers: {
+                'Content-Type': 'application/json',
+                'XSRF-TOKEN': CSRFToken,
+                'Authorization': `Bearer ${token}`
+              }
+          }
+          await axiosJWT.patch('/apisirs/rlsatutitikdua/' + id, {
+              bor,
+              los,
+              bto,
+              toi,
+              ndr,
+              gdr,
+              rata_kunjungan,
+          }, customConfig);
+          toast('Data Berhasil Diupdate', {
+              position: toast.POSITION.TOP_RIGHT
+          })
+          setTimeout(() => {
+              navigate('/rl12')
+          }, 1000);
         } catch (error) {
             console.log(error)
             toast('Data Gagal Diupdate', {

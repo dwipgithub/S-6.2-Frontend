@@ -5,10 +5,10 @@ import { useNavigate, useParams } from "react-router-dom"
 import style from './FormTambahRL53.module.css'
 import { HiSaveAs } from 'react-icons/hi'
 import { Link } from "react-router-dom"
-import { IoArrowBack } from "react-icons/io5"
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Table from 'react-bootstrap/Table';
+import { useCSRFTokenContext } from '../Context/CSRFfTokenContext.js'
 
 export const FormUbahRL53 = () => {
     const [tahun, setTahun] = useState('')
@@ -28,6 +28,7 @@ export const FormUbahRL53 = () => {
     const [setSelected] = useState([]);
     const navigate = useNavigate()
     const { id } = useParams();
+    const { CSRFToken } = useCSRFTokenContext()
 
     useEffect(() => {
         refreshToken()
@@ -38,7 +39,13 @@ export const FormUbahRL53 = () => {
 
     const refreshToken = async () => {
         try {
-            const response = await axios.get('/apisirs/token')
+            const customConfig = {
+                headers: {
+                    'XSRF-TOKEN': CSRFToken
+                }
+            }
+    
+            const response = await axios.get('/apisirs/token', customConfig)
             setToken(response.data.accessToken)
             const decoded = jwt_decode(response.data.accessToken)
             setExpire(decoded.exp)
@@ -54,7 +61,13 @@ export const FormUbahRL53 = () => {
     axiosJWT.interceptors.request.use(async (config) => {
         const currentDate = new Date()
         if (expire * 1000 < currentDate.getTime()) {
-            const response = await axios.get('/apisirs/token')
+            const customConfig = {
+                headers: {
+                    'XSRF-TOKEN': CSRFToken
+                }
+            }
+    
+            const response = await axios.get('/apisirs/token', customConfig)
             config.headers.Authorization = `Bearer ${response.data.accessToken}`
             setToken(response.data.accessToken)
             const decoded = jwt_decode(response.data.accessToken)
@@ -154,6 +167,7 @@ export const FormUbahRL53 = () => {
             const customConfig = {
                 headers: {
                     'Content-Type': 'application/json',
+                    'XSRF-TOKEN': CSRFToken,
                     'Authorization': `Bearer ${token}`
                 }
             }

@@ -4,11 +4,11 @@ import jwt_decode from 'jwt-decode'
 import { useNavigate, Link } from 'react-router-dom'
 import style from './FormTambahRL34.module.css'
 import { HiSaveAs } from 'react-icons/hi'
-import { IoArrowBack } from 'react-icons/io5'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Table from 'react-bootstrap/Table'
 import Spinner from 'react-bootstrap/Spinner'
+import { useCSRFTokenContext } from '../Context/CSRFfTokenContext.js'
 
 const FormTambahRL34 = () => {
     const [tahun, setTahun] = useState('')
@@ -22,6 +22,7 @@ const FormTambahRL34 = () => {
     const navigate = useNavigate()
     const [buttonStatus, setButtonStatus] = useState(false)
     const [spinner, setSpinner]= useState(false)
+    const { CSRFToken } = useCSRFTokenContext()
 
     useEffect(() => {
         refreshToken()
@@ -34,7 +35,13 @@ const FormTambahRL34 = () => {
 
     const refreshToken = async() => {
         try {
-            const response = await axios.get('/apisirs/token')
+            const customConfig = {
+                headers: {
+                    'XSRF-TOKEN': CSRFToken
+                }
+            }
+
+            const response = await axios.get('/apisirs/token', customConfig)
             setToken(response.data.accessToken)
             const decoded = jwt_decode(response.data.accessToken)
             setExpire(decoded.exp)
@@ -50,7 +57,13 @@ const FormTambahRL34 = () => {
     axiosJWT.interceptors.request.use(async(config) => {
         const currentDate = new Date()
         if (expire * 1000 < currentDate.getTime()) {
-            const response = await axios.get('/apisirs/token')
+            const customConfig = {
+                headers: {
+                    'XSRF-TOKEN': CSRFToken
+                }
+            }
+
+            const response = await axios.get('/apisirs/token', customConfig)
             config.headers.Authorization = `Bearer ${response.data.accessToken}`
             setToken(response.data.accessToken)
             const decoded = jwt_decode(response.data.accessToken)
@@ -404,10 +417,11 @@ const FormTambahRL34 = () => {
             const customConfig = {
                 headers: {
                     'Content-Type': 'application/json',
+                    'XSRF-TOKEN': CSRFToken,
                     'Authorization': `Bearer ${token}`
                 }
             }
-            const result = await axiosJWT.post('/apisirs/rltigatitikempat',{
+            await axiosJWT.post('/apisirs/rltigatitikempat',{
                 tahun: parseInt(tahun),
                 data: dataRLArray
             }, customConfig)

@@ -4,16 +4,13 @@ import jwt_decode from 'jwt-decode'
 import { useNavigate } from 'react-router-dom'
 import style from './FormTambahRL32.module.css'
 import { HiSaveAs } from 'react-icons/hi'
-import { RiDeleteBin5Fill, RiEdit2Fill } from 'react-icons/ri'
-import { AiFillFileAdd } from 'react-icons/ai'
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css';
 import { confirmAlert } from 'react-confirm-alert'
 import 'react-confirm-alert/src/react-confirm-alert.css'
-//import Button from 'react-bootstrap/Button';
 import { Link } from 'react-router-dom'
 import { Spinner } from 'react-bootstrap'
-
+import { useCSRFTokenContext } from '../Context/CSRFfTokenContext.js'
 
 const RL32 = () => {
     const [tahun, setTahun] = useState('')
@@ -25,6 +22,7 @@ const RL32 = () => {
     const [token, setToken] = useState('')
     const [expire, setExpire] = useState('')
     const navigate = useNavigate()
+    const { CSRFToken } = useCSRFTokenContext()
     const [spinner, setSpinner] = useState(false)
 
     useEffect(() => {
@@ -37,14 +35,19 @@ const RL32 = () => {
         getLastYear().then((results) => {
             getDataRLTigaTitikDua(results)
         })
-
         // getRLTigaTitikDuaTemplate()
         // eslint-disable-next-line react-hooks/exhaustive-deps
     },[])
 
     const refreshToken = async() => {
         try {
-            const response = await axios.get('/apisirs/token')
+            const customConfig = {
+                headers: {
+                    'XSRF-TOKEN': CSRFToken
+                }
+            }
+    
+            const response = await axios.get('/apisirs/token', customConfig)
             setToken(response.data.accessToken)
             const decoded = jwt_decode(response.data.accessToken)
             setExpire(decoded.exp)
@@ -60,7 +63,13 @@ const RL32 = () => {
     axiosJWT.interceptors.request.use(async(config) => {
         const currentDate = new Date()
         if (expire * 1000 < currentDate.getTime()) {
-            const response = await axios.get('/apisirs/token')
+            const customConfig = {
+                headers: {
+                    'XSRF-TOKEN': CSRFToken
+                }
+            }
+    
+            const response = await axios.get('/apisirs/token', customConfig)
             config.headers.Authorization = `Bearer ${response.data.accessToken}`
             setToken(response.data.accessToken)
             const decoded = jwt_decode(response.data.accessToken)
@@ -204,11 +213,12 @@ const RL32 = () => {
         const customConfig = {
             headers: {
                 'Content-Type': 'application/json',
+                'XSRF-TOKEN': CSRFToken,
                 'Authorization': `Bearer ${token}`
             }
         }
         try {
-            const results = await axiosJWT.delete(`/apisirs/rltigatitikdua/${id}`,
+            await axiosJWT.delete(`/apisirs/rltigatitikdua/${id}`,
                 customConfig)
             setDataRL((current) =>
                 current.filter((value) => value.id !== id)

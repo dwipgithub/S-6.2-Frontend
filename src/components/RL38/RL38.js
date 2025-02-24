@@ -7,9 +7,8 @@ import { HiSaveAs } from "react-icons/hi";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { confirmAlert } from "react-confirm-alert";
-import { RiDeleteBin5Fill, RiEdit2Fill } from "react-icons/ri";
-import { AiFillFileAdd } from "react-icons/ai";
 import { Spinner, Table } from "react-bootstrap";
+import { useCSRFTokenContext } from '../Context/CSRFfTokenContext.js'
 
 const RL38 = () => {
   const [tahun, setTahun] = useState("");
@@ -22,6 +21,7 @@ const RL38 = () => {
   const [expire, setExpire] = useState("");
   const [spinner, setSpinner] = useState(false);
   const navigate = useNavigate();
+  const { CSRFToken } = useCSRFTokenContext()
 
   useEffect(() => {
     refreshToken();
@@ -40,7 +40,13 @@ const RL38 = () => {
 
   const refreshToken = async () => {
     try {
-      const response = await axios.get("/apisirs/token");
+      const customConfig = {
+        headers: {
+            'XSRF-TOKEN': CSRFToken
+        }
+      }
+
+      const response = await axios.get('/apisirs/token', customConfig)
       setToken(response.data.accessToken);
       const decoded = jwt_decode(response.data.accessToken);
       setExpire(decoded.exp);
@@ -57,7 +63,13 @@ const RL38 = () => {
     async (config) => {
       const currentDate = new Date();
       if (expire * 1000 < currentDate.getTime()) {
-        const response = await axios.get("/apisirs/token");
+        const customConfig = {
+          headers: {
+              'XSRF-TOKEN': CSRFToken
+          }
+        }
+
+        const response = await axios.get('/apisirs/token', customConfig)
         config.headers.Authorization = `Bearer ${response.data.accessToken}`;
         setToken(response.data.accessToken);
         const decoded = jwt_decode(response.data.accessToken);
@@ -305,6 +317,7 @@ const RL38 = () => {
     const customConfig = {
       headers: {
         "Content-Type": "application/json",
+        'XSRF-TOKEN': CSRFToken,
         Authorization: `Bearer ${token}`,
       },
     };

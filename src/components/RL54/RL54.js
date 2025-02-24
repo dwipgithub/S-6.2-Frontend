@@ -6,26 +6,25 @@ import style from './FormTambahRL54.module.css'
 import { HiSaveAs } from 'react-icons/hi'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css'
-import { RiDeleteBin5Fill, RiEdit2Fill } from 'react-icons/ri'
-import { AiFillFileAdd } from 'react-icons/ai'
 import { confirmAlert } from 'react-confirm-alert'
 import 'react-confirm-alert/src/react-confirm-alert.css'
 import Table from 'react-bootstrap/Table';
 import Spinner from "react-bootstrap/esm/Spinner";
+import { useCSRFTokenContext } from '../Context/CSRFfTokenContext.js'
 
 export const RL54 = () => {
     const [tahun, setTahun] = useState('2022')
     const [bulan, setBulan] = useState('01')
-  const [namaRS, setNamaRS] = useState('')
-  const [alamatRS, setAlamatRS] = useState('')
-  const [namaPropinsi, setNamaPropinsi] = useState('')
-  const [namaKabKota, setNamaKabKota] = useState('')
+    const [namaRS, setNamaRS] = useState('')
+    const [alamatRS, setAlamatRS] = useState('')
+    const [namaPropinsi, setNamaPropinsi] = useState('')
+    const [namaKabKota, setNamaKabKota] = useState('')
     const [token, setToken] = useState('')
     const [expire, setExpire] = useState('')
     const [dataRL, setDataRL] = useState([]);
     const [spinner, setSpinner]= useState(false)
     const navigate = useNavigate()
-    
+    const { CSRFToken } = useCSRFTokenContext()
 
     useEffect(() => {
         refreshToken()
@@ -35,8 +34,14 @@ export const RL54 = () => {
     }, []);
 
     const refreshToken = async() => {
-      try {
-        const response = await axios.get('/apisirs/token')
+    try {
+        const customConfig = {
+            headers: {
+                'XSRF-TOKEN': CSRFToken
+            }
+        }
+
+        const response = await axios.get('/apisirs/token', customConfig)
         setToken(response.data.accessToken)
         const decoded = jwt_decode(response.data.accessToken)
         setExpire(decoded.exp)
@@ -52,7 +57,13 @@ const axiosJWT = axios.create()
 axiosJWT.interceptors.request.use(async(config) => {
     const currentDate = new Date()
     if (expire * 1000 < currentDate.getTime()) {
-        const response = await axios.get('/apisirs/token')
+        const customConfig = {
+            headers: {
+                'XSRF-TOKEN': CSRFToken
+            }
+        }
+
+        const response = await axios.get('/apisirs/token', customConfig)
         config.headers.Authorization = `Bearer ${response.data.accessToken}`
         setToken(response.data.accessToken)
         const decoded = jwt_decode(response.data.accessToken)
@@ -62,25 +73,25 @@ axiosJWT.interceptors.request.use(async(config) => {
 }, (error) => {
     return Promise.reject(error)
 })
-  
+
 const getDataRS = async (id) => {
-  try {
-      const response = await axiosJWT.get('/apisirs/rumahsakit/' + id, {
-          headers: {
-              Authorization: `Bearer ${token}`
-          }
-      })
-      console.log(response.data)
-      setNamaRS(response.data.data[0].nama)
-      setAlamatRS(response.data.data[0].alamat)
-      setNamaPropinsi(response.data.data[0].propinsi.nama)
-      setNamaKabKota(response.data.data[0].kabKota.nama)
-  } catch (error) {
-      
-  }
+    try {
+        const response = await axiosJWT.get('/apisirs/rumahsakit/' + id, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
+        console.log(response.data)
+        setNamaRS(response.data.data[0].nama)
+        setAlamatRS(response.data.data[0].alamat)
+        setNamaPropinsi(response.data.data[0].propinsi.nama)
+        setNamaKabKota(response.data.data[0].kabKota.nama)
+    } catch (error) {
+
+    }
 }
-  
-  const changeHandlerSingle = (event) => {
+
+const changeHandlerSingle = (event) => {
     const name = event.target.name
     if (name === 'tahun') {
         setTahun(event.target.value)
@@ -90,23 +101,23 @@ const getDataRS = async (id) => {
 }
 
 
-  const getCariTahun = async (tahun) => {
+const getCariTahun = async (tahun) => {
     let date = (tahun+'-'+bulan+'-01')
     setSpinner(true)
     try {
-      const customConfig = {
+        const customConfig = {
         headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
         },
         params: {
-          tahun: date,
+            tahun: date,
         },
-      };
-      const results = await axiosJWT.get("/apisirs/rllimatitikempat", customConfig);
-      const rlLimaTitikEmpatDetails = results.data.data.map((value) => {
-        return value.rl_lima_titik_empat_details;
-      });
+    };
+    const results = await axiosJWT.get("/apisirs/rllimatitikempat", customConfig);
+    const rlLimaTitikEmpatDetails = results.data.data.map((value) => {
+    return value.rl_lima_titik_empat_details;
+    });
 
       let dataRLLimaTitikEmpatDetails = [];
       rlLimaTitikEmpatDetails.forEach((element) => {
@@ -175,11 +186,12 @@ const getDataRS = async (id) => {
     const customConfig = {
         headers: {
             'Content-Type': 'application/json',
+            'XSRF-TOKEN': CSRFToken,
             'Authorization': `Bearer ${token}`
         }
     }
     try {
-         await axiosJWT.delete(`/apisirs/rllimatitikempatdetail/${id}`,
+        await axiosJWT.delete(`/apisirs/rllimatitikempatdetail/${id}`,
             customConfig)
         setDataRL((current) =>
             current.filter((value) => value.id !== id)

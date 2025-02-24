@@ -4,10 +4,10 @@ import jwt_decode from 'jwt-decode'
 import { useNavigate, Link } from 'react-router-dom'
 import style from './FormTambahRL37.module.css'
 import { HiSaveAs } from 'react-icons/hi'
-import { IoArrowBack } from 'react-icons/io5'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Spinner from 'react-bootstrap/Spinner';
+import { useCSRFTokenContext } from '../Context/CSRFfTokenContext.js'
 
 const FormTambahRL37 = () => {
     const [tahun, setTahun] = useState('')
@@ -21,7 +21,7 @@ const FormTambahRL37 = () => {
     const [buttonStatus, setButtonStatus] = useState(false)
     const [spinner, setSpinner]= useState(false)
     const navigate = useNavigate()
-
+    const { CSRFToken } = useCSRFTokenContext()
 
     useEffect(() => {
         refreshToken()
@@ -34,7 +34,13 @@ const FormTambahRL37 = () => {
 
     const refreshToken = async() => {
         try {
-            const response = await axios.get('/apisirs/token')
+            const customConfig = {
+                headers: {
+                    'XSRF-TOKEN': CSRFToken
+                }
+            }
+
+            const response = await axios.get('/apisirs/token', customConfig)
             setToken(response.data.accessToken)
             const decoded = jwt_decode(response.data.accessToken)
             setExpire(decoded.exp)
@@ -50,7 +56,13 @@ const FormTambahRL37 = () => {
     axiosJWT.interceptors.request.use(async(config) => {
         const currentDate = new Date()
         if (expire * 1000 < currentDate.getTime()) {
-            const response = await axios.get('/apisirs/token')
+            const customConfig = {
+                headers: {
+                    'XSRF-TOKEN': CSRFToken
+                }
+            }
+
+            const response = await axios.get('/apisirs/token', customConfig)
             config.headers.Authorization = `Bearer ${response.data.accessToken}`
             setToken(response.data.accessToken)
             const decoded = jwt_decode(response.data.accessToken)
@@ -158,6 +170,7 @@ const FormTambahRL37 = () => {
             const customConfig = {
                 headers: {
                     'Content-Type': 'application/json',
+                    'XSRF-TOKEN': CSRFToken,
                     'Authorization': `Bearer ${token}`
                 }
             }
@@ -166,8 +179,8 @@ const FormTambahRL37 = () => {
                 tahun: parseInt(tahun),
                 data: dataRLArray
             }, customConfig)
-          console.log(dataRLArray)
-          setSpinner(false)
+            console.log(dataRLArray)
+            setSpinner(false)
             toast('Data Berhasil Disimpan', {
                 position: toast.POSITION.TOP_RIGHT
             })

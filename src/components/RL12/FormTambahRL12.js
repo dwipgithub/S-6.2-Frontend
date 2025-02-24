@@ -4,21 +4,18 @@ import jwt_decode from 'jwt-decode'
 import { Link, useNavigate } from 'react-router-dom'
 import style from './FormTambahRL12.module.css'
 import { HiSaveAs } from 'react-icons/hi'
-import { ToastContainer, toast } from 'react-toastify';
-import { IoArrowBack } from 'react-icons/io5'
-import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer, toast } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
+import { useCSRFTokenContext } from '../Context/CSRFfTokenContext.js'
 
 const FormTambahRL12 = () => {
-    // const [tahun, setTahun] = useState('')
     const [namaRS, setNamaRS] = useState('')
     const [alamatRS, setAlamatRS] = useState('')
     const [namaPropinsi, setNamaPropinsi] = useState('')
     const [namaKabKota, setNamaKabKota] = useState('')
-    // const [dataRL, setDataRL] = useState([])
     const [token, setToken] = useState('')
     const [expire, setExpire] = useState('')
     const navigate = useNavigate()
-    const [msg, setMsg] = useState('')
     const [tahun, setTahun] = useState('')
     const [bor, setBor] = useState(0)
     const [los, setLos] = useState(0)
@@ -27,21 +24,24 @@ const FormTambahRL12 = () => {
     const [gdr, setGdr] = useState(0)
     const [ndr, setNdr] = useState(0)
     const [rataKunjungan, setRataKunjungan] = useState(0)
-    const [dataRL, setData] = useState([])
-
-
-
+    const { CSRFToken } = useCSRFTokenContext()
 
     useEffect(() => {
         refreshToken()
-        // eslint-disable-next-line react-hooks/exhaustive-deps
         const date = new Date();
         setTahun(date.getFullYear() - 1)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     const refreshToken = async () => {
         try {
-            const response = await axios.get('/apisirs/token')
+            const customConfig = {
+                headers: {
+                    'XSRF-TOKEN': CSRFToken
+                }
+            }
+
+            const response = await axios.get('/apisirs/token', customConfig)
             setToken(response.data.accessToken)
             const decoded = jwt_decode(response.data.accessToken)
             setExpire(decoded.exp)
@@ -57,7 +57,13 @@ const FormTambahRL12 = () => {
     axiosJWT.interceptors.request.use(async (config) => {
         const currentDate = new Date()
         if (expire * 1000 < currentDate.getTime()) {
-            const response = await axios.get('/apisirs/token')
+            const customConfig = {
+                headers: {
+                    'XSRF-TOKEN': CSRFToken
+                }
+            }
+    
+            const response = await axios.get('/apisirs/token', customConfig)
             config.headers.Authorization = `Bearer ${response.data.accessToken}`
             setToken(response.data.accessToken)
             const decoded = jwt_decode(response.data.accessToken)
@@ -90,6 +96,7 @@ const FormTambahRL12 = () => {
         const customConfig = {
             headers: {
                 'Content-Type': 'application/json',
+                'XSRF-TOKEN': CSRFToken,
                 'Authorization': `Bearer ${token}`
             }
         }

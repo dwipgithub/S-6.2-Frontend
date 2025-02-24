@@ -5,15 +5,13 @@ import { useNavigate, useParams } from "react-router-dom"
 import style from './FormTambahRL54.module.css'
 import { HiSaveAs } from 'react-icons/hi'
 import { Link } from "react-router-dom"
-import { IoArrowBack } from "react-icons/io5"
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Table from 'react-bootstrap/Table';
 import Spinner from "react-bootstrap/esm/Spinner"
-
+import { useCSRFTokenContext } from '../Context/CSRFfTokenContext.js'
 
 export const FormUbahRL54 = () => {
- 
     const [namaRS, setNamaRS] = useState('')
     const [alamatRS, setAlamatRS] = useState('')
     const [namaPropinsi, setNamaPropinsi] = useState('')
@@ -30,6 +28,7 @@ export const FormUbahRL54 = () => {
     const [spinner, setSpinner] = useState(false)
     const navigate = useNavigate()
     const { id } = useParams();
+    const { CSRFToken } = useCSRFTokenContext()
     
     useEffect(() => {
         refreshToken()
@@ -40,7 +39,13 @@ export const FormUbahRL54 = () => {
 
     const refreshToken = async() => {
         try {
-            const response = await axios.get('/apisirs/token')
+            const customConfig = {
+                headers: {
+                    'XSRF-TOKEN': CSRFToken
+                }
+            }
+    
+            const response = await axios.get('/apisirs/token', customConfig)
             setToken(response.data.accessToken)
             const decoded = jwt_decode(response.data.accessToken)
             setExpire(decoded.exp)
@@ -56,7 +61,13 @@ export const FormUbahRL54 = () => {
     axiosJWT.interceptors.request.use(async(config) => {
         const currentDate = new Date()
         if (expire * 1000 < currentDate.getTime()) {
-            const response = await axios.get('/apisirs/token')
+            const customConfig = {
+                headers: {
+                    'XSRF-TOKEN': CSRFToken
+                }
+            }
+    
+            const response = await axios.get('/apisirs/token', customConfig)
             config.headers.Authorization = `Bearer ${response.data.accessToken}`
             setToken(response.data.accessToken)
             const decoded = jwt_decode(response.data.accessToken)
@@ -68,14 +79,9 @@ export const FormUbahRL54 = () => {
     })
 
     const blurHandler = (event, index) => {
-       
         if(parseInt(jumlah_kunjungan) <  (parseInt(kasus_baru_Lk) + parseInt(kasus_baru_Pr)))
-       
-        alert('Jumlah Kunjungan tidak boleh lebih kecil dari Jumlah Kasus Baru')
-        
-                
-          
-      }
+            alert('Jumlah Kunjungan tidak boleh lebih kecil dari Jumlah Kasus Baru')
+        }
 
 
       const handleFocus = (event) => event.target.select();
@@ -136,11 +142,12 @@ export const FormUbahRL54 = () => {
         setButtonStatus(true)
         try {
             const customConfig = {
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${token}`
-                        }
-                    }
+                headers: {
+                    'Content-Type': 'application/json',
+                    'XSRF-TOKEN': CSRFToken,
+                    'Authorization': `Bearer ${token}`
+                }
+            }
             let jumlah_kasus_baru = parseInt(kasus_baru_Lk) + parseInt(kasus_baru_Pr)
             await axiosJWT.patch('/apisirs/rllimatitikempatdetail/' + id, {
                 kode_icd_10,

@@ -6,16 +6,9 @@ import style from "./FormTambahRL12.module.css";
 import { HiSaveAs } from "react-icons/hi";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { AiFillFileAdd } from "react-icons/ai";
 import { confirmAlert } from "react-confirm-alert";
-// import { confirmAlert } from 'react-confirm-alert'
 import "react-confirm-alert/src/react-confirm-alert.css";
-import Table from "react-bootstrap/Table";
-import Container from "react-bootstrap/Container";
-import Row from "react-bootstrap/Row";
-import Button from "react-bootstrap/Button";
 import { Link } from "react-router-dom";
-import { RiDeleteBin5Fill, RiEdit2Fill } from 'react-icons/ri'
 import Spinner from "react-bootstrap/esm/Spinner";
 import { useCSRFTokenContext } from '../Context/CSRFfTokenContext.js'
 
@@ -25,7 +18,6 @@ const RL12 = () => {
   const [alamatRS, setAlamatRS] = useState("");
   const [namaPropinsi, setNamaPropinsi] = useState("");
   const [namaKabKota, setNamaKabKota] = useState("");
-  const [nama, setNama] = useState("");
   const [dataRL, setDataRL] = useState([]);
   const [token, setToken] = useState("");
   const [expire, setExpire] = useState("");
@@ -35,7 +27,6 @@ const RL12 = () => {
 
   useEffect(() => {
     refreshToken();
-
     const getLastYear = async () => {
       const date = new Date();
       setTahun(date.getFullYear() - 1);
@@ -44,6 +35,7 @@ const RL12 = () => {
     getLastYear().then((results) => {
       getDataRLSatuTitikDua(results);
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const refreshToken = async () => {
@@ -169,8 +161,6 @@ const RL12 = () => {
       });
 
       setDataRL(datarlSatuTitikDuaDetails);
-      // console.log(datarlSatuTitikDuaDetails);
-      // console.log(dataRL);
     } catch (error) {
       console.log(error);
     }
@@ -179,12 +169,13 @@ const RL12 = () => {
   const hapusData = async (id) => {
     const customConfig = {
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
+        'XSRF-TOKEN': CSRFToken,
         Authorization: `Bearer ${token}`,
       },
     };
     try {
-      const results = await axiosJWT.delete("/apisirs/rlsatutitikdua/" + id,
+      await axiosJWT.delete("/apisirs/rlsatutitikdua/" + id,
         customConfig
       );
       setDataRL((current) => current.filter((value) => value.id !== id));

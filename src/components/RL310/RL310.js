@@ -3,17 +3,14 @@ import axios from 'axios'
 import jwt_decode from 'jwt-decode'
 import { useNavigate } from 'react-router-dom'
 import style from './FormTambahRL310.module.css'
-import { RiDeleteBin5Fill, RiEdit2Fill } from 'react-icons/ri'
 import { HiSaveAs } from 'react-icons/hi'
-import { AiFillFileAdd } from 'react-icons/ai'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { confirmAlert } from 'react-confirm-alert'
 import 'react-confirm-alert/src/react-confirm-alert.css'
 import { Link } from 'react-router-dom'
 import Spinner from "react-bootstrap/esm/Spinner";
-
-
+import { useCSRFTokenContext } from '../Context/CSRFfTokenContext.js'
 
 const RL310 = () => {
     const [tahun, setTahun] = useState('')
@@ -26,6 +23,7 @@ const RL310 = () => {
     const [expire, setExpire] = useState('')
     const [spinner, setSpinner] = useState(false)
     const navigate = useNavigate()
+    const { CSRFToken } = useCSRFTokenContext()
 
     useEffect(() => {
         refreshToken()
@@ -44,7 +42,13 @@ const RL310 = () => {
 
     const refreshToken = async () => {
         try {
-            const response = await axios.get('/apisirs/token')
+            const customConfig = {
+                headers: {
+                    'XSRF-TOKEN': CSRFToken
+                }
+            }
+    
+            const response = await axios.get('/apisirs/token', customConfig)
             setToken(response.data.accessToken)
             const decoded = jwt_decode(response.data.accessToken)
             setExpire(decoded.exp)
@@ -60,7 +64,13 @@ const RL310 = () => {
     axiosJWT.interceptors.request.use(async (config) => {
         const currentDate = new Date()
         if (expire * 1000 < currentDate.getTime()) {
-            const response = await axios.get('/apisirs/token')
+            const customConfig = {
+                headers: {
+                    'XSRF-TOKEN': CSRFToken
+                }
+            }
+    
+            const response = await axios.get('/apisirs/token', customConfig)
             config.headers.Authorization = `Bearer ${response.data.accessToken}`
             setToken(response.data.accessToken)
             const decoded = jwt_decode(response.data.accessToken)
@@ -192,6 +202,7 @@ const RL310 = () => {
         const customConfig = {
             headers: {
                 'Content-Type': 'application/json',
+                'XSRF-TOKEN': CSRFToken,
                 'Authorization': `Bearer ${token}`
             }
         }
