@@ -6,9 +6,8 @@ import style from "./FormTambahRL4a.module.css";
 import { HiSaveAs } from "react-icons/hi";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
-import { IoArrowBack } from "react-icons/io5";
 import { Spinner, Table } from "react-bootstrap";
+import { useCSRFTokenContext } from '../Context/CSRFfTokenContext.js'
 
 export const FormUbahRL4A = () => {
   const [namaRS, setNamaRS] = useState("");
@@ -21,7 +20,6 @@ export const FormUbahRL4A = () => {
   const { id } = useParams();
   const [buttonStatus, setButtonStatus] = useState(false);
   const [spinner, setSpinner] = useState(false);
-
   const [no, setNo] = useState("");
   const [nodtd, setNoDTD] = useState("");
   const [nama, setNama] = useState("");
@@ -44,15 +42,23 @@ export const FormUbahRL4A = () => {
   const [parLebih64thL, setparLebih64thL] = useState("");
   const [parLebih64thP, setparLebih64thP] = useState("");
   const [jmlhPasKeluarMati, setjmlhPasKeluarMati] = useState("");
+  const { CSRFToken } = useCSRFTokenContext()
 
   useEffect(() => {
     refreshToken();
     getRLEmpatA();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const refreshToken = async () => {
     try {
-      const response = await axios.get("/apisirs/token");
+      const customConfig = {
+        headers: {
+            'XSRF-TOKEN': CSRFToken
+        }
+      }
+
+      const response = await axios.get('/apisirs/token', customConfig)
       setToken(response.data.accessToken);
       const decoded = jwt_decode(response.data.accessToken);
       setExpire(decoded.exp);
@@ -69,7 +75,13 @@ export const FormUbahRL4A = () => {
     async (config) => {
       const currentDate = new Date();
       if (expire * 1000 < currentDate.getTime()) {
-        const response = await axios.get("/apisirs/token");
+        const customConfig = {
+          headers: {
+              'XSRF-TOKEN': CSRFToken
+          }
+        }
+  
+        const response = await axios.get('/apisirs/token', customConfig)
         config.headers.Authorization = `Bearer ${response.data.accessToken}`;
         setToken(response.data.accessToken);
         const decoded = jwt_decode(response.data.accessToken);
@@ -158,6 +170,7 @@ export const FormUbahRL4A = () => {
       const customConfig = {
         headers: {
           "Content-Type": "application/json",
+          'XSRF-TOKEN': CSRFToken,
           Authorization: `Bearer ${token}`,
         },
       };

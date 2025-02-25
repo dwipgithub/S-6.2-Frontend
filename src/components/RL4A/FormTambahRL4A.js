@@ -7,8 +7,8 @@ import { HiSaveAs } from "react-icons/hi";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Table from "react-bootstrap/Table";
-import { IoArrowBack } from "react-icons/io5";
 import { Spinner } from "react-bootstrap";
+import { useCSRFTokenContext } from '../Context/CSRFfTokenContext.js'
 
 const FormTambahRL4A = () => {
   const [tahun, setTahun] = useState(new Date().getFullYear() - 1);
@@ -25,6 +25,7 @@ const FormTambahRL4A = () => {
   const [spinnerSearch, setSpinnerSearch] = useState(false);
   const [spinner, setSpinner] = useState(false);
   const navigate = useNavigate();
+  const { CSRFToken } = useCSRFTokenContext()
 
   useEffect(() => {
     refreshToken();
@@ -33,7 +34,13 @@ const FormTambahRL4A = () => {
 
   const refreshToken = async () => {
     try {
-      const response = await axios.get("/apisirs/token");
+      const customConfig = {
+        headers: {
+          'XSRF-TOKEN': CSRFToken
+        }
+      }
+
+      const response = await axios.get('/apisirs/token', customConfig)
       setToken(response.data.accessToken);
       const decoded = jwt_decode(response.data.accessToken);
       setExpire(decoded.exp);
@@ -50,7 +57,13 @@ const FormTambahRL4A = () => {
     async (config) => {
       const currentDate = new Date();
       if (expire * 1000 < currentDate.getTime()) {
-        const response = await axios.get("/apisirs/token");
+        const customConfig = {
+          headers: {
+            'XSRF-TOKEN': CSRFToken
+          }
+        }
+  
+        const response = await axios.get('/apisirs/token', customConfig)
         config.headers.Authorization = `Bearer ${response.data.accessToken}`;
         setToken(response.data.accessToken);
         const decoded = jwt_decode(response.data.accessToken);
@@ -259,6 +272,7 @@ const FormTambahRL4A = () => {
         const customConfig = {
           headers: {
             "Content-Type": "application/json",
+            'XSRF-TOKEN': CSRFToken,
             Authorization: `Bearer ${token}`,
           },
         };
@@ -392,12 +406,12 @@ const FormTambahRL4A = () => {
       </div>
       <div className="row mt-3">
         <div className="col-md-6">
-        <Link to={`/rl4a/`} className='btn btn-info' style={{fontSize:"18px", backgroundColor: "#779D9E", color: "#FFFFFF"}}>
-          {/* <IoArrowBack size={30} style={{ color: "gray", cursor: "pointer" }} /> */}
-          &lt;
-        </Link>
-          <span style={{ color: "gray" }}> 
-          Kembali RL 4A Penyakit Rawat Inap</span>
+          <Link to={`/rl4a/`} className='btn btn-info' style={{ fontSize: "18px", backgroundColor: "#779D9E", color: "#FFFFFF" }}>
+            {/* <IoArrowBack size={30} style={{ color: "gray", cursor: "pointer" }} /> */}
+            &lt;
+          </Link>
+          <span style={{ color: "gray" }}>
+            Kembali RL 4A Penyakit Rawat Inap</span>
           <div className="card">
             <div className="card-body">
               <h5 className="card-title h5">Search Nama Penyakit</h5>

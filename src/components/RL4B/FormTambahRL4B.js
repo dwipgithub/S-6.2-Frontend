@@ -7,8 +7,8 @@ import style from "./FormTambahRL4B.module.css";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Table from "react-bootstrap/Table";
-import { IoArrowBack } from "react-icons/io5";
 import Spinner from "react-bootstrap/Spinner";
+import { useCSRFTokenContext } from '../Context/CSRFfTokenContext.js'
 
 const FormTambahRL4B = () => {
   const [tahun, setTahun] = useState(new Date().getFullYear() - 1);
@@ -24,7 +24,7 @@ const FormTambahRL4B = () => {
   const [buttonStatus, setButtonStatus] = useState(false)
   const [spinnerSearch, setSpinnerSearch] = useState(false);
   const [spinner, setSpinner] = useState(false);
-
+  const { CSRFToken } = useCSRFTokenContext()
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -34,7 +34,13 @@ const FormTambahRL4B = () => {
 
   const refreshToken = async () => {
     try {
-      const response = await axios.get("/apisirs/token");
+      const customConfig = {
+        headers: {
+          'XSRF-TOKEN': CSRFToken
+        }
+      }
+
+      const response = await axios.get('/apisirs/token', customConfig)
       setToken(response.data.accessToken);
       const decoded = jwt_decode(response.data.accessToken);
       setExpire(decoded.exp);
@@ -51,7 +57,13 @@ const FormTambahRL4B = () => {
     async (config) => {
       const currentDate = new Date();
       if (expire * 1000 < currentDate.getTime()) {
-        const response = await axios.get("/apisirs/token");
+        const customConfig = {
+          headers: {
+            'XSRF-TOKEN': CSRFToken
+          }
+        }
+  
+        const response = await axios.get('/apisirs/token', customConfig)
         config.headers.Authorization = `Bearer ${response.data.accessToken}`;
         setToken(response.data.accessToken);
         const decoded = jwt_decode(response.data.accessToken);
@@ -240,6 +252,7 @@ const FormTambahRL4B = () => {
         const customConfig = {
           headers: {
             "Content-Type": "application/json",
+            'XSRF-TOKEN': CSRFToken,
             Authorization: `Bearer ${token}`,
           },
         };

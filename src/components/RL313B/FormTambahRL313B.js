@@ -4,11 +4,11 @@ import jwt_decode from 'jwt-decode'
 import { useNavigate, Link } from 'react-router-dom'
 import style from './FormTambahRL313B.module.css'
 import { HiSaveAs } from 'react-icons/hi'
-import { IoArrowBack } from 'react-icons/io5'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Table from 'react-bootstrap/esm/Table'
 import Spinner from 'react-bootstrap/esm/Spinner'
+import { useCSRFTokenContext } from '../Context/CSRFfTokenContext.js'
 
 const FormTambahRL313B = () => {
     const [tahun, setTahun] = useState('')
@@ -22,7 +22,7 @@ const FormTambahRL313B = () => {
     const [spinner, setSpinner] = useState(false)
     const [buttonStatus, setButtonStatus] = useState(false)
     const navigate = useNavigate()
-
+    const { CSRFToken } = useCSRFTokenContext()
 
     useEffect(() => {
         refreshToken()
@@ -31,27 +31,39 @@ const FormTambahRL313B = () => {
         const date = new Date();
         setTahun(date.getFullYear() - 1)
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    },[])
+    }, [])
 
-    const refreshToken = async() => {
+    const refreshToken = async () => {
         try {
-            const response = await axios.get('/apisirs/token')
+            const customConfig = {
+                headers: {
+                    'XSRF-TOKEN': CSRFToken
+                }
+            }
+    
+            const response = await axios.get('/apisirs/token', customConfig)
             setToken(response.data.accessToken)
             const decoded = jwt_decode(response.data.accessToken)
             setExpire(decoded.exp)
             getDataRS(decoded.rsId)
         } catch (error) {
-            if(error.response) {
+            if (error.response) {
                 navigate('/')
             }
         }
     }
 
     const axiosJWT = axios.create()
-    axiosJWT.interceptors.request.use(async(config) => {
+    axiosJWT.interceptors.request.use(async (config) => {
         const currentDate = new Date()
         if (expire * 1000 < currentDate.getTime()) {
-            const response = await axios.get('/apisirs/token')
+            const customConfig = {
+                headers: {
+                    'XSRF-TOKEN': CSRFToken
+                }
+            }
+    
+            const response = await axios.get('/apisirs/token', customConfig)
             config.headers.Authorization = `Bearer ${response.data.accessToken}`
             setToken(response.data.accessToken)
             const decoded = jwt_decode(response.data.accessToken)
@@ -75,11 +87,11 @@ const FormTambahRL313B = () => {
             setNamaPropinsi(response.data.data[0].propinsi.nama)
             setNamaKabKota(response.data.data[0].kabKota.nama)
         } catch (error) {
-            
+
         }
     }
 
-    const getRLTigaTitikTigaBelasBTemplate = async() => {
+    const getRLTigaTitikTigaBelasBTemplate = async () => {
         setSpinner(true)
         try {
             const response = await axiosJWT.get('/apisirs/getgolonganobat', {
@@ -87,7 +99,7 @@ const FormTambahRL313B = () => {
                     Authorization: `Bearer ${token}`
                 }
             })
-            
+
             const rlTemplate = response.data.data.map((value, index) => {
                 return {
                     id: value.id,
@@ -109,7 +121,7 @@ const FormTambahRL313B = () => {
             setSpinner(false)
             console.log(response.data.data)
         } catch (error) {
-            
+
         }
     }
 
@@ -134,22 +146,22 @@ const FormTambahRL313B = () => {
         } else if (name === 'golonganObat') {
             newDataRL[index].golonganObat = event.target.value
         } else if (name === 'rawatJalan') {
-            if(event.target.value === ''){   
+            if (event.target.value === '') {
                 event.target.value = 0
                 event.target.select(event.target.value)
-                }
+            }
             newDataRL[index].rawatJalan = event.target.value
         } else if (name === 'igd') {
-            if(event.target.value === ''){   
+            if (event.target.value === '') {
                 event.target.value = 0
                 event.target.select(event.target.value)
-                }
+            }
             newDataRL[index].igd = event.target.value
         } else if (name === 'rawatInap') {
-            if(event.target.value === ''){   
+            if (event.target.value === '') {
                 event.target.value = 0
                 event.target.select(event.target.value)
-                }
+            }
             newDataRL[index].rawatInap = event.target.value
         }
         setDataRL(newDataRL)
@@ -174,10 +186,11 @@ const FormTambahRL313B = () => {
             const customConfig = {
                 headers: {
                     'Content-Type': 'application/json',
+                    'XSRF-TOKEN': CSRFToken,
                     'Authorization': `Bearer ${token}`
                 }
             }
-            await axiosJWT.post('/apisirs/rltigatitiktigabelasb',{
+            await axiosJWT.post('/apisirs/rltigatitiktigabelasb', {
                 tahun: parseInt(tahun),
                 data: dataRLArray
             }, customConfig)
@@ -200,12 +213,12 @@ const FormTambahRL313B = () => {
     const preventPasteNegative = (e) => {
         const clipboardData = e.clipboardData || window.clipboardData;
         const pastedData = parseFloat(clipboardData.getData('text'));
-    
+
         if (pastedData < 0) {
             e.preventDefault();
         }
     }
-    
+
     const preventMinus = (e) => {
         if (e.code === 'Minus') {
             e.preventDefault();
@@ -213,36 +226,36 @@ const FormTambahRL313B = () => {
     }
     const maxLengthCheck = (object) => {
         if (object.target.value.length > object.target.maxLength) {
-          object.target.value = object.target.value.slice(0, object.target.maxLength)
+            object.target.value = object.target.value.slice(0, object.target.maxLength)
         }
-      }
+    }
 
     return (
-        <div className="container" style={{marginTop: "70px"}}>
+        <div className="container" style={{ marginTop: "70px" }}>
             <form onSubmit={Simpan}>
                 <div className="row">
                     <div className="col-md-6">
                         <div className="card">
                             <div className="card-body">
                                 <h5 className="card-title h5">Profile Fasyankes</h5>
-                                <div className="form-floating" style={{width:"100%", display:"inline-block"}}>
+                                <div className="form-floating" style={{ width: "100%", display: "inline-block" }}>
                                     <input type="text" className="form-control" id="floatingInput"
-                                        value={ namaRS } disabled={true}/>
+                                        value={namaRS} disabled={true} />
                                     <label htmlFor="floatingInput">Nama</label>
                                 </div>
-                                <div className="form-floating" style={{width:"100%", display:"inline-block"}}>
+                                <div className="form-floating" style={{ width: "100%", display: "inline-block" }}>
                                     <input type="text" className="form-control" id="floatingInput"
-                                        value={ alamatRS} disabled={true}/>
+                                        value={alamatRS} disabled={true} />
                                     <label htmlFor="floatingInput">Alamat</label>
                                 </div>
-                                <div className="form-floating" style={{width:"50%", display:"inline-block"}}>
+                                <div className="form-floating" style={{ width: "50%", display: "inline-block" }}>
                                     <input type="text" className="form-control" id="floatingInput"
-                                        value={ namaPropinsi } disabled={true}/>
+                                        value={namaPropinsi} disabled={true} />
                                     <label htmlFor="floatingInput">Provinsi </label>
                                 </div>
-                                <div className="form-floating" style={{width:"50%", display:"inline-block"}}>
+                                <div className="form-floating" style={{ width: "50%", display: "inline-block" }}>
                                     <input type="text" className="form-control" id="floatingInput"
-                                        value={ namaKabKota } disabled={true}/>
+                                        value={namaKabKota} disabled={true} />
                                     <label htmlFor="floatingInput">Kab/Kota</label>
                                 </div>
                             </div>
@@ -252,9 +265,9 @@ const FormTambahRL313B = () => {
                         <div className="card">
                             <div className="card-body">
                                 <h5 className="card-title h5">Periode Laporan</h5>
-                                <div className="form-floating" style={{width:"100%", display:"inline-block"}}>
-                                    <input name="tahun" type="text" className="form-control" id="floatingInput" 
-                                        placeholder="Tahun" value={tahun} onChange={e => changeHandlerSingle(e)} disabled/>
+                                <div className="form-floating" style={{ width: "100%", display: "inline-block" }}>
+                                    <input name="tahun" type="text" className="form-control" id="floatingInput"
+                                        placeholder="Tahun" value={tahun} onChange={e => changeHandlerSingle(e)} disabled />
                                     <label htmlFor="floatingInput">Tahun</label>
                                 </div>
                             </div>
@@ -263,12 +276,12 @@ const FormTambahRL313B = () => {
                 </div>
                 <div className="row mt-3">
                     <div className="col-md-12">
-                        <Link to={`/rl313b/`} className='btn btn-info' style={{fontSize:"18px", backgroundColor: "#779D9E", color: "#FFFFFF"}}>
+                        <Link to={`/rl313b/`} className='btn btn-info' style={{ fontSize: "18px", backgroundColor: "#779D9E", color: "#FFFFFF" }}>
                             {/* <IoArrowBack size={30} style={{color:"gray",cursor: "pointer"}}/><span style={{color: "gray"}}></span> */}
                             &lt;
-                            </Link>
-                            <span style={{color: "gray"}}>RL 3.13 Obat Pelayanan Resep</span>
-                        
+                        </Link>
+                        <span style={{ color: "gray" }}>RL 3.13 Obat Pelayanan Resep</span>
+
                         <div className="container" style={{ textAlign: "center" }}>
                             {spinner && <Spinner animation="grow" variant="success"></Spinner>}
                             {spinner && <Spinner animation="grow" variant="success"></Spinner>}
@@ -281,7 +294,7 @@ const FormTambahRL313B = () => {
                             <thead>
                                 <tr>
                                     <th>No Golongan Obat</th>
-                                    <th style={{"width": "2%"}}></th>
+                                    <th style={{ "width": "2%" }}></th>
                                     <th>Golongan Obat</th>
                                     <th>Rawat Jalan</th>
                                     <th>IGD</th>
@@ -293,42 +306,42 @@ const FormTambahRL313B = () => {
                                     return (
                                         <tr key={value.id}>
                                             <td><center>{value.no}</center></td>
-                                            <td style={{textAlign: "center", verticalAlign: "middle"}}>
-                                                <input type="checkbox" name='check' className="form-check-input" onChange={e => changeHandler(e, index)} checked={value.checked}/>
+                                            <td style={{ textAlign: "center", verticalAlign: "middle" }}>
+                                                <input type="checkbox" name='check' className="form-check-input" onChange={e => changeHandler(e, index)} checked={value.checked} />
                                             </td>
                                             <td>
-                                            {value.golonganObat}
+                                                {value.golonganObat}
                                             </td>
-                                            
+
                                             <td><input type="number" min={0} maxLength={7}
-                                                onInput={(e) => maxLengthCheck(e)} name="rawatJalan" className="form-control" value={value.rawatJalan} 
-                                                onFocus={handleFocus}  onChange={e => changeHandler(e, index)} disabled={value.disabledInput} onPaste={preventPasteNegative}
-                                                onKeyPress={preventMinus}/>
-                                            </td>
-                                            <td><input type="number" min={0} maxLength={7}
-                                                onInput={(e) => maxLengthCheck(e)} name="igd" className="form-control" value={value.igd} 
-                                                onFocus={handleFocus}  onChange={e => changeHandler(e, index)} disabled={value.disabledInput} onPaste={preventPasteNegative}
-                                                onKeyPress={preventMinus}/>
+                                                onInput={(e) => maxLengthCheck(e)} name="rawatJalan" className="form-control" value={value.rawatJalan}
+                                                onFocus={handleFocus} onChange={e => changeHandler(e, index)} disabled={value.disabledInput} onPaste={preventPasteNegative}
+                                                onKeyPress={preventMinus} />
                                             </td>
                                             <td><input type="number" min={0} maxLength={7}
-                                                onInput={(e) => maxLengthCheck(e)} name="rawatInap" className="form-control" value={value.rawatInap} 
-                                                onFocus={handleFocus}  onChange={e => changeHandler(e, index)} disabled={value.disabledInput} onPaste={preventPasteNegative}
-                                                onKeyPress={preventMinus}/>
+                                                onInput={(e) => maxLengthCheck(e)} name="igd" className="form-control" value={value.igd}
+                                                onFocus={handleFocus} onChange={e => changeHandler(e, index)} disabled={value.disabledInput} onPaste={preventPasteNegative}
+                                                onKeyPress={preventMinus} />
+                                            </td>
+                                            <td><input type="number" min={0} maxLength={7}
+                                                onInput={(e) => maxLengthCheck(e)} name="rawatInap" className="form-control" value={value.rawatInap}
+                                                onFocus={handleFocus} onChange={e => changeHandler(e, index)} disabled={value.disabledInput} onPaste={preventPasteNegative}
+                                                onKeyPress={preventMinus} />
                                             </td>
                                         </tr>
                                     )
-                                }) }
+                                })}
                             </tbody>
                         </Table>
                     </div>
                 </div>
                 <div className="mt-3 mb-3">
-                <ToastContainer />
-                    <button type="submit" className="btn btn-outline-success" disabled={buttonStatus}><HiSaveAs/> Simpan</button>
+                    <ToastContainer />
+                    <button type="submit" className="btn btn-outline-success" disabled={buttonStatus}><HiSaveAs /> Simpan</button>
                 </div>
             </form>
         </div>
-        
+
     )
 }
 

@@ -9,9 +9,8 @@ import "react-toastify/dist/ReactToastify.css";
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
 import Table from "react-bootstrap/Table";
-import { AiFillFileAdd } from "react-icons/ai";
-import { RiDeleteBin5Fill, RiEdit2Fill } from "react-icons/ri";
 import { Spinner } from "react-bootstrap";
+import { useCSRFTokenContext } from '../Context/CSRFfTokenContext.js'
 
 const RL4ASebab = () => {
   const [namaRS, setNamaRS] = useState("");
@@ -24,6 +23,7 @@ const RL4ASebab = () => {
   const [expire, setExpire] = useState("");
   const navigate = useNavigate();
   const [spinner, setSpinner] = useState(false);
+  const { CSRFToken } = useCSRFTokenContext()
 
   useEffect(() => {
     refreshToken();
@@ -35,11 +35,18 @@ const RL4ASebab = () => {
     getLastYear().then((results) => {
       getDataRLEmpatASebabDetails(results);
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const refreshToken = async () => {
     try {
-      const response = await axios.get("/apisirs/token");
+      const customConfig = {
+        headers: {
+          'XSRF-TOKEN': CSRFToken
+        }
+      }
+
+      const response = await axios.get('/apisirs/token', customConfig)
       setToken(response.data.accessToken);
       const decoded = jwt_decode(response.data.accessToken);
       setExpire(decoded.exp);
@@ -56,7 +63,13 @@ const RL4ASebab = () => {
     async (config) => {
       const currentDate = new Date();
       if (expire * 1000 < currentDate.getTime()) {
-        const response = await axios.get("/apisirs/token");
+        const customConfig = {
+          headers: {
+            'XSRF-TOKEN': CSRFToken
+          }
+        }
+  
+        const response = await axios.get('/apisirs/token', customConfig)
         config.headers.Authorization = `Bearer ${response.data.accessToken}`;
         setToken(response.data.accessToken);
         const decoded = jwt_decode(response.data.accessToken);
@@ -166,6 +179,7 @@ const RL4ASebab = () => {
     try {
       const customConfig = {
         headers: {
+          'XSRF-TOKEN': CSRFToken,
           Authorization: `Bearer ${token}`,
         },
       };

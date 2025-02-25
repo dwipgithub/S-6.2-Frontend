@@ -4,11 +4,11 @@ import jwt_decode from 'jwt-decode'
 import { useNavigate, useParams } from "react-router-dom"
 import style from './FormTambahRL314.module.css'
 import { HiSaveAs } from 'react-icons/hi'
-import { IoArrowBack } from 'react-icons/io5'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Link } from 'react-router-dom'
- 
+import { useCSRFTokenContext } from '../Context/CSRFfTokenContext.js'
+
 export const FormUbahRL314 = () => {
     const [tahun, setTahun] = useState('')
     const [namaRS, setNamaRS] = useState('')
@@ -16,45 +16,60 @@ export const FormUbahRL314 = () => {
     const [namaPropinsi, setNamaPropinsi] = useState('')
     const [namaKabKota, setNamaKabKota] = useState('')
     const [jenisSpesialis, setJenisSpesialis] = useState('')
-    const [rujukanDiterimaDariPuskesmas,setrujukanDiterimaDariPuskesmas] =useState('')
-    const [rujukanDiterimaDariFasilitasKesehatanLain,setrujukanDiterimaDariFasilitasKesehatanLain] =useState('')
-    const [rujukanDiterimaDariRsLain,setrujukanDiterimaDariRsLain] =useState('')
-    const [rujukanDikembalikanKePuskesmas,setrujukanDikembalikanKePuskesmas] =useState('')
-    const [rujukanDikembalikanKeFasilitasKesehatanLain,setrujukanDikembalikanKeFasilitasKesehatanLain] =useState('')
-    const [rujukanDikembalikanKeRsAsal,setrujukanDikembalikanKeRsAsal] =useState('')
-    const [dirujukanPasienRujukan,setdirujukanPasienRujukan] =useState('')
-    const [dirujukPasienDatangSendiri,setdirujukPasienDatangSendiri] =useState('')
-    const [dirujukDiterimaKembali,setdirujukDiterimaKembali] =useState('')
+    const [rujukanDiterimaDariPuskesmas, setrujukanDiterimaDariPuskesmas] = useState('')
+    const [rujukanDiterimaDariFasilitasKesehatanLain, setrujukanDiterimaDariFasilitasKesehatanLain] = useState('')
+    const [rujukanDiterimaDariRsLain, setrujukanDiterimaDariRsLain] = useState('')
+    const [rujukanDikembalikanKePuskesmas, setrujukanDikembalikanKePuskesmas] = useState('')
+    const [rujukanDikembalikanKeFasilitasKesehatanLain, setrujukanDikembalikanKeFasilitasKesehatanLain] = useState('')
+    const [rujukanDikembalikanKeRsAsal, setrujukanDikembalikanKeRsAsal] = useState('')
+    const [dirujukanPasienRujukan, setdirujukanPasienRujukan] = useState('')
+    const [dirujukPasienDatangSendiri, setdirujukPasienDatangSendiri] = useState('')
+    const [dirujukDiterimaKembali, setdirujukDiterimaKembali] = useState('')
     const [dataRL, setDataRL] = useState([])
     const [token, setToken] = useState('')
     const [expire, setExpire] = useState('')
     const navigate = useNavigate()
     const { id } = useParams();
-    
+    const { CSRFToken } = useCSRFTokenContext()
+
     useEffect(() => {
         refreshToken()
         getDataRLTigaTitikEmpatBelasDetailById(id);
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    const refreshToken = async() => {
+    const refreshToken = async () => {
         try {
-            const response = await axios.get('/apisirs/token')
+            const customConfig = {
+                headers: {
+                    'XSRF-TOKEN': CSRFToken
+                }
+            }
+
+            const response = await axios.get('/apisirs/token', customConfig)
             setToken(response.data.accessToken)
             const decoded = jwt_decode(response.data.accessToken)
             setExpire(decoded.exp)
             getDataRS(decoded.rsId)
         } catch (error) {
-            if(error.response) {
+            if (error.response) {
                 navigate('/')
             }
         }
     }
 
     const axiosJWT = axios.create()
-    axiosJWT.interceptors.request.use(async(config) => {
+    axiosJWT.interceptors.request.use(async (config) => {
         const currentDate = new Date()
         if (expire * 1000 < currentDate.getTime()) {
-            const response = await axios.get('/apisirs/token')
+            const customConfig = {
+                headers: {
+                    'XSRF-TOKEN': CSRFToken
+                }
+            }
+
+            const response = await axios.get('/apisirs/token', customConfig)
             config.headers.Authorization = `Bearer ${response.data.accessToken}`
             setToken(response.data.accessToken)
             const decoded = jwt_decode(response.data.accessToken)
@@ -80,10 +95,6 @@ export const FormUbahRL314 = () => {
         } catch (error) {
             console.log(error)
         }
-    }
-
-    const changeHandlerSingle = (event) => {
-        setTahun(event.target.value)
     }
 
     const getDataRLTigaTitikEmpatBelasDetailById = async (id) => {
@@ -114,7 +125,7 @@ export const FormUbahRL314 = () => {
         if (event.target.value === '') {
             event.target.value = 0
             event.target.select(event.target.value)
-          }
+        }
         const targetName = event.target.name
         switch (targetName) {
             case "rujukanDiterimaDariPuskesmas":
@@ -145,7 +156,7 @@ export const FormUbahRL314 = () => {
                 setdirujukDiterimaKembali(event.target.value)
                 break
         }
-        
+
     }
 
     const Simpan = async (e) => {
@@ -166,12 +177,13 @@ export const FormUbahRL314 = () => {
             const customConfig = {
                 headers: {
                     'Content-Type': 'application/json',
+                    'XSRF-TOKEN': CSRFToken,
                     'Authorization': `Bearer ${token}`
                 }
             }
 
-            const result = await axiosJWT.patch('/apisirs/rltigatitikempatbelasdetail/' + id, data, customConfig)
-            
+            await axiosJWT.patch('/apisirs/rltigatitikempatbelasdetail/' + id, data, customConfig)
+
             toast('Data Berhasil Diubah', {
                 position: toast.POSITION.TOP_RIGHT
             })
@@ -184,61 +196,61 @@ export const FormUbahRL314 = () => {
                 position: toast.POSITION.TOP_RIGHT
             })
         }
-    }    
+    }
 
-    const preventPasteNegative= (e) => {
+    const preventPasteNegative = (e) => {
         const clipboardData = e.clipboardData || window.clipboardData;
         const pastedData = parseFloat(clipboardData.getData('text'));
 
-        if(pastedData <0){
+        if (pastedData < 0) {
             e.preventDefault();
         }
     }
 
     const preventMinus = (e) => {
-        if(e.code === 'Minus'){
+        if (e.code === 'Minus') {
             e.preventDefault();
         }
     }
 
     const maxLengthCheck = (object) => {
         if (object.target.value.length > object.target.maxLength) {
-          object.target.value = object.target.value.slice(0, object.target.maxLength)
+            object.target.value = object.target.value.slice(0, object.target.maxLength)
         }
-      }
+    }
 
-  return (
-    <div className="container" style={{marginTop: "70px"}}>
-    <form onSubmit={Simpan}>
-        <div className="row">
-            <div className="col-md-6">
-                <div className="card">
-                    <div className="card-body">
-                        <h5 className="card-title h5">Profile Fasyankes</h5>
-                        <div className="form-floating" style={{width:"100%", display:"inline-block"}}>
-                            <input type="text" className="form-control" id="floatingInput"
-                                value={ namaRS } disabled={true}/>
-                            <label htmlFor="floatingInput">Nama</label>
-                        </div>
-                        <div className="form-floating" style={{width:"100%", display:"inline-block"}}>
-                            <input type="text" className="form-control" id="floatingInput"
-                                value={ alamatRS} disabled={true}/>
-                            <label htmlFor="floatingInput">Alamat</label>
-                        </div>
-                        <div className="form-floating" style={{width:"50%", display:"inline-block"}}>
-                            <input type="text" className="form-control" id="floatingInput"
-                                value={ namaPropinsi } disabled={true}/>
-                            <label htmlFor="floatingInput">Provinsi </label>
-                        </div>
-                        <div className="form-floating" style={{width:"50%", display:"inline-block"}}>
-                            <input type="text" className="form-control" id="floatingInput"
-                                value={ namaKabKota } disabled={true}/>
-                            <label htmlFor="floatingInput">Kab/Kota</label>
+    return (
+        <div className="container" style={{ marginTop: "70px" }}>
+            <form onSubmit={Simpan}>
+                <div className="row">
+                    <div className="col-md-6">
+                        <div className="card">
+                            <div className="card-body">
+                                <h5 className="card-title h5">Profile Fasyankes</h5>
+                                <div className="form-floating" style={{ width: "100%", display: "inline-block" }}>
+                                    <input type="text" className="form-control" id="floatingInput"
+                                        value={namaRS} disabled={true} />
+                                    <label htmlFor="floatingInput">Nama</label>
+                                </div>
+                                <div className="form-floating" style={{ width: "100%", display: "inline-block" }}>
+                                    <input type="text" className="form-control" id="floatingInput"
+                                        value={alamatRS} disabled={true} />
+                                    <label htmlFor="floatingInput">Alamat</label>
+                                </div>
+                                <div className="form-floating" style={{ width: "50%", display: "inline-block" }}>
+                                    <input type="text" className="form-control" id="floatingInput"
+                                        value={namaPropinsi} disabled={true} />
+                                    <label htmlFor="floatingInput">Provinsi </label>
+                                </div>
+                                <div className="form-floating" style={{ width: "50%", display: "inline-block" }}>
+                                    <input type="text" className="form-control" id="floatingInput"
+                                        value={namaKabKota} disabled={true} />
+                                    <label htmlFor="floatingInput">Kab/Kota</label>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </div>
-            {/* <div className="col-md-6">
+                    {/* <div className="col-md-6">
                 <div className="card">
                     <div className="card-body">
                         <h5 className="card-title h5">Periode Laporan</h5>
@@ -250,91 +262,91 @@ export const FormUbahRL314 = () => {
                     </div>
                 </div>
             </div> */}
-        </div>
-        <br></br>
-        <div className="row mt-3">
-            <div className="col-md-12">
-            {/* <Link to={`/rl314/`} style={{textDecoration: "none"}}>
+                </div>
+                <br></br>
+                <div className="row mt-3">
+                    <div className="col-md-12">
+                        {/* <Link to={`/rl314/`} style={{textDecoration: "none"}}>
                 <IoArrowBack size={30} style={{color:"gray",cursor: "pointer"}}/><span style={{color: "gray"}}>RL 3.14 Rujukan</span>
             </Link> */}
-            <Link to={`/rl314/`} className='btn btn-info' style={{fontSize:"18px", backgroundColor: "#779D9E", color: "#FFFFFF"}}>
-                {/* <IoArrowBack size={30} style={{color:"gray",cursor: "pointer"}}/> */}
-                &lt;
-            </Link>
-            <span style={{color: "gray"}}>Kembali RL 3.14 Rujukan</span>
-        <h3></h3>
-                <table className={style.rlTable}>
-                    <thead>
-                        <tr>
-                        {/* <th style={{"width": "6%"}}>No.</th> */}
-                        <th style={{"width": "5%"}}>No Kegiatan</th>
-                        {/* <th style={{"width": "3%"}}></th> */}
-                        <th style={{"width": "20%"}}>Jenis Spesialisasi</th>
-                        <th>Rujukan Diterima Dari Puskesmas</th>
-                        <th>Rujukan Diterima Dari Fasilitas Kesehatan Lain</th>
-                        <th>Rujukan Diterima Dari Rumah Sakit Lain</th>
-                        <th>Rujukan Dikembalikan Ke Puskesmas</th>
-                        <th>Rujukan Dikembalikan Ke Fasilitas Kesehatan Lain</th>
-                        <th>Rujukan Dikembalikan Ke Rumah Sakit Asal</th>
-                        <th>Dirujuk Pasien Rujukan</th>
-                        <th>Dirujuk Pasien Datang Sendiri</th>
-                        <th>Dirujuk Diterima Kembali</th>
-                        </tr>
-                    </thead> 
-                    <tbody>
-                    <td>
-                        <input type='text' name='id' className="form-control" value="1" disabled={true}/>
-                    </td>
-                    <td>
-                        <input type="text" name="jenisSpesialis" className="form-control" value={jenisSpesialis} disabled={true} />
-                    </td>
-                    <td>
-                        <input type="number" min='0' maxLength={7} onInput={(e) => maxLengthCheck(e)} onPaste={preventPasteNegative} onKeyPress={preventMinus} name="rujukanDiterimaDariPuskesmas" className="form-control" value={rujukanDiterimaDariPuskesmas} 
-                        onChange={e => changeHandler(e)} />
-                    </td>
-                    <td>
-                        <input type="number" min='0' maxLength={7} onInput={(e) => maxLengthCheck(e)} onPaste={preventPasteNegative} onKeyPress={preventMinus} name="rujukanDiterimaDariFasilitasKesehatanLain" className="form-control" value={rujukanDiterimaDariFasilitasKesehatanLain} 
-                        onChange={e => changeHandler(e)} />
-                    </td>
-                    <td>
-                        <input type="number" min='0' maxLength={7} onInput={(e) => maxLengthCheck(e)} onPaste={preventPasteNegative} onKeyPress={preventMinus} name="rujukanDiterimaDariRsLain" className="form-control" value={rujukanDiterimaDariRsLain} 
-                        onChange={e => changeHandler(e)} />
-                    </td>
-                    <td>
-                    <input type="number" min='0' maxLength={7} onInput={(e) => maxLengthCheck(e)} onPaste={preventPasteNegative} onKeyPress={preventMinus} name="rujukanDikembalikanKePuskesmas" className="form-control" value={rujukanDikembalikanKePuskesmas} 
-                    onChange={e => changeHandler(e)} />
-                    </td>
-                    <td>
-                        <input type="number" min='0' maxLength={7} onInput={(e) => maxLengthCheck(e)} onPaste={preventPasteNegative} onKeyPress={preventMinus} name="rujukanDikembalikanKeFasilitasKesehatanLain" className="form-control" value={rujukanDikembalikanKeFasilitasKesehatanLain} 
-                        onChange={e => changeHandler(e)} />
-                    </td>
-                    <td>
-                        <input type="number" min='0' maxLength={7} onInput={(e) => maxLengthCheck(e)} onPaste={preventPasteNegative} onKeyPress={preventMinus} name="rujukanDikembalikanKeRsAsal" className="form-control" value={rujukanDikembalikanKeRsAsal} 
-                        onChange={e => changeHandler(e)} />
-                    </td>
-                    <td>
-                        <input type="number" min='0' maxLength={7} onInput={(e) => maxLengthCheck(e)} onPaste={preventPasteNegative} onKeyPress={preventMinus} name="dirujukanPasienRujukan" className="form-control" value={dirujukanPasienRujukan} 
-                        onChange={e => changeHandler(e)} />
-                    </td>
-                    <td>
-                        <input type="number" min='0' maxLength={7} onInput={(e) => maxLengthCheck(e)} onPaste={preventPasteNegative} onKeyPress={preventMinus} name="dirujukPasienDatangSendiri" className="form-control" value={dirujukPasienDatangSendiri} 
-                        onChange={e => changeHandler(e)} />
-                    </td>
-                    <td>
-                        <input type="number" min='0' maxLength={7} onInput={(e) => maxLengthCheck(e)} onPaste={preventPasteNegative} onKeyPress={preventMinus} name="dirujukDiterimaKembali" className="form-control" value={dirujukDiterimaKembali} 
-                        onChange={e => changeHandler(e)} />
-                    </td>
-                    </tbody>
-                </table>
-            </div>
+                        <Link to={`/rl314/`} className='btn btn-info' style={{ fontSize: "18px", backgroundColor: "#779D9E", color: "#FFFFFF" }}>
+                            {/* <IoArrowBack size={30} style={{color:"gray",cursor: "pointer"}}/> */}
+                            &lt;
+                        </Link>
+                        <span style={{ color: "gray" }}>Kembali RL 3.14 Rujukan</span>
+                        <h3></h3>
+                        <table className={style.rlTable}>
+                            <thead>
+                                <tr>
+                                    {/* <th style={{"width": "6%"}}>No.</th> */}
+                                    <th style={{ "width": "5%" }}>No Kegiatan</th>
+                                    {/* <th style={{"width": "3%"}}></th> */}
+                                    <th style={{ "width": "20%" }}>Jenis Spesialisasi</th>
+                                    <th>Rujukan Diterima Dari Puskesmas</th>
+                                    <th>Rujukan Diterima Dari Fasilitas Kesehatan Lain</th>
+                                    <th>Rujukan Diterima Dari Rumah Sakit Lain</th>
+                                    <th>Rujukan Dikembalikan Ke Puskesmas</th>
+                                    <th>Rujukan Dikembalikan Ke Fasilitas Kesehatan Lain</th>
+                                    <th>Rujukan Dikembalikan Ke Rumah Sakit Asal</th>
+                                    <th>Dirujuk Pasien Rujukan</th>
+                                    <th>Dirujuk Pasien Datang Sendiri</th>
+                                    <th>Dirujuk Diterima Kembali</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <td>
+                                    <input type='text' name='id' className="form-control" value="1" disabled={true} />
+                                </td>
+                                <td>
+                                    <input type="text" name="jenisSpesialis" className="form-control" value={jenisSpesialis} disabled={true} />
+                                </td>
+                                <td>
+                                    <input type="number" min='0' maxLength={7} onInput={(e) => maxLengthCheck(e)} onPaste={preventPasteNegative} onKeyPress={preventMinus} name="rujukanDiterimaDariPuskesmas" className="form-control" value={rujukanDiterimaDariPuskesmas}
+                                        onChange={e => changeHandler(e)} />
+                                </td>
+                                <td>
+                                    <input type="number" min='0' maxLength={7} onInput={(e) => maxLengthCheck(e)} onPaste={preventPasteNegative} onKeyPress={preventMinus} name="rujukanDiterimaDariFasilitasKesehatanLain" className="form-control" value={rujukanDiterimaDariFasilitasKesehatanLain}
+                                        onChange={e => changeHandler(e)} />
+                                </td>
+                                <td>
+                                    <input type="number" min='0' maxLength={7} onInput={(e) => maxLengthCheck(e)} onPaste={preventPasteNegative} onKeyPress={preventMinus} name="rujukanDiterimaDariRsLain" className="form-control" value={rujukanDiterimaDariRsLain}
+                                        onChange={e => changeHandler(e)} />
+                                </td>
+                                <td>
+                                    <input type="number" min='0' maxLength={7} onInput={(e) => maxLengthCheck(e)} onPaste={preventPasteNegative} onKeyPress={preventMinus} name="rujukanDikembalikanKePuskesmas" className="form-control" value={rujukanDikembalikanKePuskesmas}
+                                        onChange={e => changeHandler(e)} />
+                                </td>
+                                <td>
+                                    <input type="number" min='0' maxLength={7} onInput={(e) => maxLengthCheck(e)} onPaste={preventPasteNegative} onKeyPress={preventMinus} name="rujukanDikembalikanKeFasilitasKesehatanLain" className="form-control" value={rujukanDikembalikanKeFasilitasKesehatanLain}
+                                        onChange={e => changeHandler(e)} />
+                                </td>
+                                <td>
+                                    <input type="number" min='0' maxLength={7} onInput={(e) => maxLengthCheck(e)} onPaste={preventPasteNegative} onKeyPress={preventMinus} name="rujukanDikembalikanKeRsAsal" className="form-control" value={rujukanDikembalikanKeRsAsal}
+                                        onChange={e => changeHandler(e)} />
+                                </td>
+                                <td>
+                                    <input type="number" min='0' maxLength={7} onInput={(e) => maxLengthCheck(e)} onPaste={preventPasteNegative} onKeyPress={preventMinus} name="dirujukanPasienRujukan" className="form-control" value={dirujukanPasienRujukan}
+                                        onChange={e => changeHandler(e)} />
+                                </td>
+                                <td>
+                                    <input type="number" min='0' maxLength={7} onInput={(e) => maxLengthCheck(e)} onPaste={preventPasteNegative} onKeyPress={preventMinus} name="dirujukPasienDatangSendiri" className="form-control" value={dirujukPasienDatangSendiri}
+                                        onChange={e => changeHandler(e)} />
+                                </td>
+                                <td>
+                                    <input type="number" min='0' maxLength={7} onInput={(e) => maxLengthCheck(e)} onPaste={preventPasteNegative} onKeyPress={preventMinus} name="dirujukDiterimaKembali" className="form-control" value={dirujukDiterimaKembali}
+                                        onChange={e => changeHandler(e)} />
+                                </td>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div className="mt-3 mb-3">
+                    <ToastContainer />
+                    <button type="submit" className="btn btn-outline-success"><HiSaveAs /> Update</button>
+                </div>
+            </form>
         </div>
-        <div className="mt-3 mb-3">
-        <ToastContainer />
-            <button type="submit" className="btn btn-outline-success"><HiSaveAs/> Update</button>
-        </div>
-    </form>
-</div>
-  )
+    )
 }
- 
+
 export default FormUbahRL314

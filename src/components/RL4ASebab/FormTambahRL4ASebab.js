@@ -5,10 +5,10 @@ import { useNavigate, Link } from "react-router-dom";
 import style from "./FormTambahRL4ASebab.module.css";
 import Table from "react-bootstrap/Table";
 import { HiSaveAs } from "react-icons/hi";
-import { IoArrowBack } from "react-icons/io5";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Spinner } from "react-bootstrap";
+import { useCSRFTokenContext } from '../Context/CSRFfTokenContext.js'
 
 const FormTambahRL4ASebab = () => {
   const [tahun, setTahun] = useState(new Date().getFullYear() - 1);
@@ -25,6 +25,7 @@ const FormTambahRL4ASebab = () => {
   const [buttonStatus, setButtonStatus] = useState(false);
   const [spinnerSearch, setSpinnerSearch] = useState(false);
   const [spinner, setSpinner] = useState(false);
+  const { CSRFToken } = useCSRFTokenContext()
 
   useEffect(() => {
     refreshToken();
@@ -35,7 +36,13 @@ const FormTambahRL4ASebab = () => {
 
   const refreshToken = async () => {
     try {
-      const response = await axios.get("/apisirs/token");
+      const customConfig = {
+        headers: {
+          'XSRF-TOKEN': CSRFToken
+        }
+      }
+
+      const response = await axios.get('/apisirs/token', customConfig)
       setToken(response.data.accessToken);
       const decoded = jwt_decode(response.data.accessToken);
       setExpire(decoded.exp);
@@ -52,7 +59,13 @@ const FormTambahRL4ASebab = () => {
     async (config) => {
       const currentDate = new Date();
       if (expire * 1000 < currentDate.getTime()) {
-        const response = await axios.get("/apisirs/token");
+        const customConfig = {
+          headers: {
+            'XSRF-TOKEN': CSRFToken
+          }
+        }
+  
+        const response = await axios.get('/apisirs/token', customConfig)
         config.headers.Authorization = `Bearer ${response.data.accessToken}`;
         setToken(response.data.accessToken);
         const decoded = jwt_decode(response.data.accessToken);
@@ -243,6 +256,7 @@ const FormTambahRL4ASebab = () => {
         const customConfig = {
           headers: {
             "Content-Type": "application/json",
+            'XSRF-TOKEN': CSRFToken,
             Authorization: `Bearer ${token}`,
           },
         };

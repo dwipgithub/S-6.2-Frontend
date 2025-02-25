@@ -6,10 +6,9 @@ import style from "./FormTambahRL4B.module.css";
 import { HiSaveAs } from "react-icons/hi";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
-import { IoArrowBack } from "react-icons/io5";
 import { Table } from "react-bootstrap";
 import Spinner from "react-bootstrap/Spinner";
+import { useCSRFTokenContext } from '../Context/CSRFfTokenContext.js'
 
 export const FormEditRL4B = () => {
   // const [tahun, setTahun] = useState("");
@@ -51,6 +50,7 @@ export const FormEditRL4B = () => {
   const [jmlhKunjungan, setjmlhPasKunjungan] = useState("");
   const [spinner, setSpinner] = useState(false);
   const [buttonStatus, setButtonStatus] = useState(false)
+  const { CSRFToken } = useCSRFTokenContext()
 
   useEffect(() => {
     refreshToken();
@@ -60,7 +60,13 @@ export const FormEditRL4B = () => {
 
   const refreshToken = async () => {
     try {
-      const response = await axios.get("/apisirs/token");
+      const customConfig = {
+        headers: {
+            'XSRF-TOKEN': CSRFToken
+        }
+      }
+
+      const response = await axios.get('/apisirs/token', customConfig)
       setToken(response.data.accessToken);
       const decoded = jwt_decode(response.data.accessToken);
       setExpire(decoded.exp);
@@ -77,7 +83,13 @@ export const FormEditRL4B = () => {
     async (config) => {
       const currentDate = new Date();
       if (expire * 1000 < currentDate.getTime()) {
-        const response = await axios.get("/apisirs/token");
+        const customConfig = {
+          headers: {
+              'XSRF-TOKEN': CSRFToken
+          }
+        }
+  
+        const response = await axios.get('/apisirs/token', customConfig)
         config.headers.Authorization = `Bearer ${response.data.accessToken}`;
         setToken(response.data.accessToken);
         const decoded = jwt_decode(response.data.accessToken);
@@ -166,6 +178,7 @@ export const FormEditRL4B = () => {
         const customConfig = {
           headers: {
             "Content-Type": "application/json",
+            'XSRF-TOKEN': CSRFToken,
             Authorization: `Bearer ${token}`,
           },
         };

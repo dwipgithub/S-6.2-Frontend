@@ -9,9 +9,8 @@ import "react-toastify/dist/ReactToastify.css";
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
 import Table from "react-bootstrap/Table";
-import { AiFillFileAdd } from "react-icons/ai";
-import { RiDeleteBin5Fill, RiEdit2Fill } from "react-icons/ri";
 import { Spinner } from "react-bootstrap";
+import { useCSRFTokenContext } from '../Context/CSRFfTokenContext.js'
 
 const RL4A = () => {
   const [namaRS, setNamaRS] = useState("");
@@ -24,6 +23,7 @@ const RL4A = () => {
   const [expire, setExpire] = useState("");
   const navigate = useNavigate();
   const [spinner, setSpinner] = useState(false);
+  const { CSRFToken } = useCSRFTokenContext()
 
   useEffect(() => {
     refreshToken();
@@ -35,11 +35,18 @@ const RL4A = () => {
     getLastYear().then((results) => {
       getDataRLEmpatADetails(results);
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const refreshToken = async () => {
     try {
-      const response = await axios.get("/apisirs/token");
+      const customConfig = {
+        headers: {
+          'XSRF-TOKEN': CSRFToken
+        }
+      }
+
+      const response = await axios.get('/apisirs/token', customConfig)
       setToken(response.data.accessToken);
       const decoded = jwt_decode(response.data.accessToken);
       setExpire(decoded.exp);
@@ -56,7 +63,13 @@ const RL4A = () => {
     async (config) => {
       const currentDate = new Date();
       if (expire * 1000 < currentDate.getTime()) {
-        const response = await axios.get("/apisirs/token");
+        const customConfig = {
+          headers: {
+            'XSRF-TOKEN': CSRFToken
+          }
+        }
+  
+        const response = await axios.get('/apisirs/token', customConfig)
         config.headers.Authorization = `Bearer ${response.data.accessToken}`;
         setToken(response.data.accessToken);
         const decoded = jwt_decode(response.data.accessToken);
@@ -80,7 +93,7 @@ const RL4A = () => {
       setAlamatRS(response.data.data[0].alamat);
       setNamaPropinsi(response.data.data[0].propinsi.nama);
       setNamaKabKota(response.data.data[0].kabKota.nama);
-    } catch (error) {}
+    } catch (error) { }
   };
 
   const getDataRLEmpatADetails = async (event) => {
@@ -160,6 +173,7 @@ const RL4A = () => {
     try {
       const customConfig = {
         headers: {
+          'XSRF-TOKEN': CSRFToken,
           Authorization: `Bearer ${token}`,
         },
       };
@@ -291,10 +305,10 @@ const RL4A = () => {
       </div>
       <div className="row mt-3 mb-3">
         <div className="col-md-12">
-          <Link to={`/rl4a/tambah/`} className='btn btn-info' style={{fontSize:"18px", backgroundColor: "#779D9E", color: "#FFFFFF"}}>
-          +
+          <Link to={`/rl4a/tambah/`} className='btn btn-info' style={{ fontSize: "18px", backgroundColor: "#779D9E", color: "#FFFFFF" }}>
+            +
           </Link>
-            <span style={{ color: "gray" }}>RL 4A</span>
+          <span style={{ color: "gray" }}>RL 4A</span>
           <div className="container" style={{ textAlign: "center" }}>
             {/* <h5>test</h5> */}
             {spinner && <Spinner animation="grow" variant="success"></Spinner>}
@@ -365,13 +379,13 @@ const RL4A = () => {
                     </td>
                     <td>
                       <ToastContainer />
-                      <div style={{display: "flex"}}>
-                      <button className="btn btn-danger" style={{margin: "0 5px 0 0", backgroundColor: "#FF6663", border: "1px solid #FF6663"}} type='button' onClick={(e) => Delete(value.id)}>H</button>
-                      <Link to={`/rl4a/ubah/${value.id}`} className='btn btn-warning' style={{margin: "0 5px 0 0", backgroundColor: "#CFD35E", border: "1px solid #CFD35E", color:"#FFFFFF"}} >
-                        U
-                      </Link>
+                      <div style={{ display: "flex" }}>
+                        <button className="btn btn-danger" style={{ margin: "0 5px 0 0", backgroundColor: "#FF6663", border: "1px solid #FF6663" }} type='button' onClick={(e) => Delete(value.id)}>H</button>
+                        <Link to={`/rl4a/ubah/${value.id}`} className='btn btn-warning' style={{ margin: "0 5px 0 0", backgroundColor: "#CFD35E", border: "1px solid #CFD35E", color: "#FFFFFF" }} >
+                          U
+                        </Link>
                       </div>
-                    
+
                     </td>
                     <td style={{ textAlign: "left" }}>
                       <label>{value.jenis_gol_sebab_penyakit.nama}</label>
