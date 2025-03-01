@@ -5,7 +5,7 @@ import { useNavigate, useParams, Link} from "react-router-dom"
 import style from "./FormTambahRL12.module.css"
 import { HiSaveAs } from "react-icons/hi"
 import { ToastContainer, toast } from "react-toastify"
-import { useCSRFTokenContext } from '../Context/CSRFfTokenContext.js'
+import { useCSRFTokenContext } from '../Context/CSRFTokenContext.js'
 
 const FormEditRL12 = () => {
   const [namaRS, setNamaRS] = useState("");

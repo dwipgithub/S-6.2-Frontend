@@ -9,7 +9,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css'
 import 'react-confirm-alert/src/react-confirm-alert.css'
 import Spinner from 'react-bootstrap/Spinner'
-import { useCSRFTokenContext } from '../Context/CSRFfTokenContext.js'
+import { useCSRFTokenContext } from '../Context/CSRFTokenContext.js'
 
 const RL52 = () => {
     const [tahun, setTahun] = useState('2022')
@@ -136,7 +136,6 @@ const RL52 = () => {
 
     const Cari = async (e) => {
         let date = (tahun+'-'+bulan+'-01')
-        // console.log(date)
         e.preventDefault()
         setSpinner(true)
         try {

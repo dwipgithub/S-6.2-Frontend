@@ -6,7 +6,7 @@ import Navbar from 'react-bootstrap/Navbar'
 import NavDropdown  from 'react-bootstrap/NavDropdown'
 import { Link, useNavigate } from 'react-router-dom'
 import logoImage from '../Images/sirsIcon.png'
-import { useCSRFTokenContext } from '../Context/CSRFfTokenContext.js';
+import { useCSRFTokenContext } from '../Context/CSRFTokenContext.js';
 
 const NavigationBar = () => {
     const navigate = useNavigate()
@@ -25,7 +25,7 @@ const NavigationBar = () => {
                 withCredentials: true
             } 
 
-            await axios.post('/apisirs/logout',{}, customConfig)
+            await axios.delete('/apisirs/logout', customConfig)
             localStorage.removeItem('name')
             navigate('/')
         } catch (error) {

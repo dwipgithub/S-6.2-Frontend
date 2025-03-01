@@ -10,7 +10,7 @@ import 'react-toastify/dist/ReactToastify.css'
 import 'react-confirm-alert/src/react-confirm-alert.css'
 import Table from "react-bootstrap/Table";
 import Spinner from 'react-bootstrap/Spinner'
-import { useCSRFTokenContext } from '../Context/CSRFfTokenContext.js'
+import { useCSRFTokenContext } from '../Context/CSRFTokenContext.js'
 
 const RL35 = () => {
     const [tahun, setTahun] = useState('')

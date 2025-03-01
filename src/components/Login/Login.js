@@ -6,7 +6,7 @@ import { BoxArrowDownRight} from "react-bootstrap-icons";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import sirsImage from '../Images/sirsImage4.jpeg'
-import { useCSRFTokenContext } from '../Context/CSRFfTokenContext.js';
+import { useCSRFTokenContext } from '../Context/CSRFTokenContext.js';
 // import ReCAPTCHA from "react-google-recaptcha"
 
 const Login = () => {

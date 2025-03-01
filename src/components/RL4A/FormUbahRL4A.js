@@ -7,7 +7,7 @@ import { HiSaveAs } from "react-icons/hi";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Spinner, Table } from "react-bootstrap";
-import { useCSRFTokenContext } from '../Context/CSRFfTokenContext.js'
+import { useCSRFTokenContext } from '../Context/CSRFTokenContext.js'
 
 export const FormUbahRL4A = () => {
   const [namaRS, setNamaRS] = useState("");

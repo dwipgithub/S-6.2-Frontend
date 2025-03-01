@@ -10,7 +10,7 @@ import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
 import Table from "react-bootstrap/Table";
 import { Spinner } from "react-bootstrap";
-import { useCSRFTokenContext } from '../Context/CSRFfTokenContext.js'
+import { useCSRFTokenContext } from '../Context/CSRFTokenContext.js'
 
 const RL4A = () => {
   const [namaRS, setNamaRS] = useState("");
@@ -177,7 +177,7 @@ const RL4A = () => {
           Authorization: `Bearer ${token}`,
         },
       };
-      const test = await axiosJWT.delete(
+      await axiosJWT.delete(
         "/apisirs/rlempata/" + id,
         customConfig
       );

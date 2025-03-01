@@ -7,7 +7,7 @@ import { HiSaveAs } from 'react-icons/hi'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Table from 'react-bootstrap/Table'
-import { useCSRFTokenContext } from '../Context/CSRFfTokenContext.js'
+import { useCSRFTokenContext } from '../Context/CSRFTokenContext.js'
 
 const FormUbahRL31 = () => {
     const [namaRS, setNamaRS] = useState('')

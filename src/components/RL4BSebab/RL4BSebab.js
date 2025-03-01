@@ -10,7 +10,7 @@ import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
 import Table from "react-bootstrap/Table";
 import Spinner from "react-bootstrap/Spinner";
-import { useCSRFTokenContext } from '../Context/CSRFfTokenContext.js'
+import { useCSRFTokenContext } from '../Context/CSRFTokenContext.js'
 
 const RL4BSebab = () => {
   const [namaRS, setNamaRS] = useState("");

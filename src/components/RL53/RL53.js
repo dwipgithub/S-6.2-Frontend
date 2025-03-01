@@ -10,7 +10,7 @@ import { confirmAlert } from 'react-confirm-alert'
 import 'react-confirm-alert/src/react-confirm-alert.css'
 import Table from 'react-bootstrap/Table';
 import Spinner from "react-bootstrap/esm/Spinner";
-import { useCSRFTokenContext } from '../Context/CSRFfTokenContext.js'
+import { useCSRFTokenContext } from '../Context/CSRFTokenContext.js'
 
 export const RL53 = () => {
     const [tahun, setTahun] = useState('2022')

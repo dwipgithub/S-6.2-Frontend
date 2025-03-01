@@ -6,7 +6,7 @@ import style from './FormTambahRL12.module.css'
 import { HiSaveAs } from 'react-icons/hi'
 import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
-import { useCSRFTokenContext } from '../Context/CSRFfTokenContext.js'
+import { useCSRFTokenContext } from '../Context/CSRFTokenContext.js'
 
 const FormTambahRL12 = () => {
     const [namaRS, setNamaRS] = useState('')
