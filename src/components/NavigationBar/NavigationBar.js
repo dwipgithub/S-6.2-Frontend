@@ -136,6 +136,8 @@ const NavigationBar = () => {
                                 RL 5.4 Daftar 10 Besar Penyakit Rawat Jalan
                             </NavDropdown.Item>
                         </NavDropdown>
+                        <Nav.Link as={Link} to="/absensi">Absensi</Nav.Link>
+
                     </Nav>
                 </Navbar.Collapse>
                 
