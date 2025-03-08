@@ -5,6 +5,9 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import Login from "./components/Login/Login"
 import NavigationBar from "./components/NavigationBar/NavigationBar"
 
+// Absensi
+import Absensi from "./components/Absensi/absensi.js";
+
 // User
 import FormUbahPassword from "./components/User/FormUbahPassword"
 import FormTambahUser from "./components/User/FormTambahUser"
@@ -253,6 +256,16 @@ function App() {
           <Route path="/rl54/tambah" element={<><NavigationBar/><FormTambahRL54/></>}/>
           <Route path="/rl54/ubah/:id" element={<><NavigationBar/><FormUbahRL54/></>}/>
 
+          <Route
+          path="/absensi"
+          element={
+            <>
+              <NavigationBar />
+              <Absensi />
+             
+            </>
+          }
+        />
           <Route path="*" element={<PageNotFound />} status={404}/>
         </Routes>
       </BrowserRouter>
